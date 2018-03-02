@@ -1340,7 +1340,7 @@ public class ModelBinder {
 		final Collection collectionBinding;
 
 		if ( attributeSource instanceof PluralAttributeSourceListImpl ) {
-			collectionBinding = new org.hibernate.mapping.List( sourceDocument.getMetadataCollector(), entityDescriptor );
+			collectionBinding = new org.hibernate.mapping.List( sourceDocument, entityDescriptor );
 			bindCollectionMetadata( sourceDocument, attributeSource, collectionBinding );
 
 			registerSecondPass(
@@ -1353,7 +1353,7 @@ public class ModelBinder {
 			);
 		}
 		else if ( attributeSource instanceof PluralAttributeSourceSetImpl ) {
-			collectionBinding = new Set( sourceDocument.getMetadataCollector(), entityDescriptor );
+			collectionBinding = new Set( sourceDocument, entityDescriptor );
 			bindCollectionMetadata( sourceDocument, attributeSource, collectionBinding );
 
 			registerSecondPass(
@@ -1362,7 +1362,7 @@ public class ModelBinder {
 			);
 		}
 		else if ( attributeSource instanceof PluralAttributeSourceMapImpl ) {
-			collectionBinding = new org.hibernate.mapping.Map( sourceDocument.getMetadataCollector(), entityDescriptor );
+			collectionBinding = new org.hibernate.mapping.Map( sourceDocument, entityDescriptor );
 			bindCollectionMetadata( sourceDocument, attributeSource, collectionBinding );
 
 			registerSecondPass(
@@ -1375,7 +1375,7 @@ public class ModelBinder {
 			);
 		}
 		else if ( attributeSource instanceof PluralAttributeSourceBagImpl ) {
-			collectionBinding = new Bag( sourceDocument.getMetadataCollector(), entityDescriptor );
+			collectionBinding = new Bag( sourceDocument, entityDescriptor );
 			bindCollectionMetadata( sourceDocument, attributeSource, collectionBinding );
 
 			registerSecondPass(
@@ -1384,7 +1384,7 @@ public class ModelBinder {
 			);
 		}
 		else if ( attributeSource instanceof PluralAttributeSourceIdBagImpl ) {
-			collectionBinding = new IdentifierBag( sourceDocument.getMetadataCollector(), entityDescriptor );
+			collectionBinding = new IdentifierBag( sourceDocument, entityDescriptor );
 			bindCollectionMetadata( sourceDocument, attributeSource, collectionBinding );
 
 			registerSecondPass(
@@ -1394,7 +1394,7 @@ public class ModelBinder {
 		}
 		else if ( attributeSource instanceof PluralAttributeSourceArrayImpl ) {
 			final PluralAttributeSourceArray arraySource = (PluralAttributeSourceArray) attributeSource;
-			collectionBinding = new Array( sourceDocument.getMetadataCollector(), entityDescriptor );
+			collectionBinding = new Array( sourceDocument, entityDescriptor );
 			bindCollectionMetadata( sourceDocument, attributeSource, collectionBinding );
 
 			( (Array) collectionBinding ).setElementClassName(
@@ -1411,7 +1411,7 @@ public class ModelBinder {
 			);
 		}
 		else if ( attributeSource instanceof PluralAttributeSourcePrimitiveArrayImpl ) {
-			collectionBinding = new PrimitiveArray( sourceDocument.getMetadataCollector(), entityDescriptor );
+			collectionBinding = new PrimitiveArray( sourceDocument, entityDescriptor );
 			bindCollectionMetadata( sourceDocument, attributeSource, collectionBinding );
 
 			registerSecondPass(
@@ -3462,7 +3462,7 @@ public class ModelBinder {
 				final PluralAttributeElementSourceOneToMany elementSource =
 						(PluralAttributeElementSourceOneToMany) getPluralAttributeSource().getElementSource();
 				final OneToMany elementBinding = new OneToMany(
-						getMappingDocument().getMetadataCollector(),
+						getMappingDocument(),
 						getCollectionBinding().getOwner()
 				);
 				collectionBinding.setElement( elementBinding );

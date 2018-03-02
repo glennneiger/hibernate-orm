@@ -8,6 +8,7 @@ package org.hibernate.testing.boot;
 
 import org.hibernate.boot.internal.BootstrapContextImpl;
 import org.hibernate.boot.internal.ClassLoaderAccessImpl;
+import org.hibernate.boot.internal.ClassmateContext;
 import org.hibernate.boot.internal.InFlightMetadataCollectorImpl;
 import org.hibernate.boot.internal.MetadataBuilderImpl;
 import org.hibernate.boot.model.naming.ObjectNameNormalizer;
@@ -41,7 +42,7 @@ public class MetadataBuildingContextTestingImpl implements MetadataBuildingConte
 		buildingOptions = new MetadataBuilderImpl.MetadataBuildingOptionsImpl( serviceRegistry );
 		bootstrapContext = new BootstrapContextImpl(
 				serviceRegistry,
-				null,
+				new ClassmateContext(),
 				buildingOptions
 		);
 		mappingDefaults = new MetadataBuilderImpl.MappingDefaultsImpl( serviceRegistry );

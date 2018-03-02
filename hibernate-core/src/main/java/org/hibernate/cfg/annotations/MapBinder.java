@@ -73,7 +73,7 @@ public class MapBinder extends CollectionBinder {
 	}
 
 	protected Collection createCollection(PersistentClass persistentClass) {
-		return new org.hibernate.mapping.Map( getBuildingContext().getMetadataCollector(), persistentClass );
+		return new org.hibernate.mapping.Map( getBuildingContext(), persistentClass );
 	}
 
 	@Override

@@ -68,7 +68,6 @@ import org.hibernate.internal.util.xml.XMLHelper;
 
 import org.hibernate.testing.boot.BootstrapContextImpl;
 import org.hibernate.testing.junit4.BaseUnitTestCase;
-import org.hibernate.testing.boot.ClassLoaderAccessTestingImpl;
 import org.hibernate.testing.boot.ClassLoaderServiceTestingImpl;
 import org.junit.Test;
 
