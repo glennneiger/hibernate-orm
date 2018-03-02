@@ -9,7 +9,7 @@ package org.hibernate.mapping;
 import java.util.Map;
 
 import org.hibernate.MappingException;
-import org.hibernate.boot.spi.MetadataImplementor;
+import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.type.MetaType;
 import org.hibernate.type.Type;
 
@@ -23,8 +23,8 @@ public class Any extends SimpleValue {
 	private String metaTypeName = "string";
 	private Map metaValues;
 
-	public Any(MetadataImplementor metadata, Table table) {
-		super( metadata, table );
+	public Any(MetadataBuildingContext buildingContext, Table table) {
+		super( buildingContext, table );
 	}
 
 	public String getIdentifierType() {

@@ -13,18 +13,13 @@ import javax.persistence.SharedCacheMode;
 import org.hibernate.HibernateException;
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
-import org.hibernate.boot.AttributeConverterInfo;
 import org.hibernate.boot.CacheRegionDefinition;
-import org.hibernate.boot.archive.scan.spi.ScanEnvironment;
-import org.hibernate.boot.archive.scan.spi.ScanOptions;
-import org.hibernate.boot.archive.spi.ArchiveDescriptorFactory;
 import org.hibernate.boot.model.IdGeneratorStrategyInterpreter;
 import org.hibernate.boot.model.naming.ImplicitNamingStrategy;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
 import org.hibernate.boot.model.relational.AuxiliaryDatabaseObject;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.cache.spi.access.AccessType;
-import org.hibernate.cfg.AttributeConverterDefinition;
 import org.hibernate.cfg.MetadataSourceType;
 import org.hibernate.dialect.function.SQLFunction;
 
@@ -67,31 +62,6 @@ public abstract class AbstractDelegatingMetadataBuildingOptions implements Metad
 	@Override
 	public IndexView getJandexView() {
 		return delegate.getJandexView();
-	}
-
-	@Override
-	public ScanOptions getScanOptions() {
-		return delegate.getScanOptions();
-	}
-
-	@Override
-	public ScanEnvironment getScanEnvironment() {
-		return delegate.getScanEnvironment();
-	}
-
-	@Override
-	public Object getScanner() {
-		return delegate.getScanner();
-	}
-
-	@Override
-	public ArchiveDescriptorFactory getArchiveDescriptorFactory() {
-		return delegate.getArchiveDescriptorFactory();
-	}
-
-	@Override
-	public ClassLoader getTempClassLoader() {
-		return delegate.getTempClassLoader();
 	}
 
 	@Override
@@ -172,11 +142,6 @@ public abstract class AbstractDelegatingMetadataBuildingOptions implements Metad
 	@Override
 	public List<AuxiliaryDatabaseObject> getAuxiliaryDatabaseObjectList() {
 		return delegate.getAuxiliaryDatabaseObjectList();
-	}
-
-	@Override
-	public List<AttributeConverterInfo> getAttributeConverters() {
-		return delegate.getAttributeConverters();
 	}
 
 	@Override

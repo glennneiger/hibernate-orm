@@ -412,7 +412,7 @@ public class SimpleValueBinder {
 		if ( table == null ) {
 			table = columns[0].getTable();
 		}
-		simpleValue = new SimpleValue( buildingContext.getMetadataCollector(), table );
+		simpleValue = new SimpleValue( buildingContext, table );
 		if ( isVersion ) {
 			simpleValue.makeVersion();
 		}
@@ -535,7 +535,7 @@ public class SimpleValueBinder {
 		if ( simpleValue.getTypeName() != null && simpleValue.getTypeName().length() > 0
 				&& simpleValue.getMetadata().getTypeResolver().basic( simpleValue.getTypeName() ) == null ) {
 			try {
-				Class typeClass = buildingContext.getClassLoaderAccess().classForName( simpleValue.getTypeName() );
+				Class typeClass = buildingContext.getBootstrapContext().getClassLoaderAccess().classForName( simpleValue.getTypeName() );
 
 				if ( typeClass != null && DynamicParameterizedType.class.isAssignableFrom( typeClass ) ) {
 					Properties parameters = simpleValue.getTypeParameters();

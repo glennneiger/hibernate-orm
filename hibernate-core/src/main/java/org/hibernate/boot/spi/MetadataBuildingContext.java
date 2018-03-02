@@ -19,6 +19,7 @@ import org.hibernate.boot.model.naming.ObjectNameNormalizer;
  * @since 5.0
  */
 public interface MetadataBuildingContext {
+	BootstrapContext getBootstrapContext();
 	/**
 	 * Access to the options specified by the {@link org.hibernate.boot.MetadataBuilder}
 	 *
@@ -40,12 +41,6 @@ public interface MetadataBuildingContext {
 	 */
 	public InFlightMetadataCollector getMetadataCollector();
 
-	/**
-	 * Provides access to ClassLoader services when needed during binding
-	 *
-	 * @return The ClassLoaderAccess
-	 */
-	public ClassLoaderAccess getClassLoaderAccess();
 
 	/**
 	 * Not sure how I feel about this exposed here

@@ -24,7 +24,7 @@ import org.hibernate.boot.model.convert.spi.ConverterDescriptor;
 import org.hibernate.boot.model.convert.spi.JpaAttributeConverterCreationContext;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
-import org.hibernate.boot.spi.InFlightMetadataCollector;
+import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.dialect.Dialect;
@@ -66,7 +66,7 @@ public class SimpleValue implements KeyValue {
 
 	public static final String DEFAULT_ID_GEN_STRATEGY = "assigned";
 
-	private final MetadataImplementor metadata;
+	private final MetadataBuildingContext buildingContext;
 
 	private final List<Selectable> columns = new ArrayList<Selectable>();
 	private final List<Boolean> insertability = new ArrayList<Boolean>();
@@ -90,22 +90,27 @@ public class SimpleValue implements KeyValue {
 	private ConverterDescriptor attributeConverterDescriptor;
 	private Type type;
 
-	public SimpleValue(MetadataImplementor metadata) {
-		this.metadata = metadata;
+	public SimpleValue(MetadataBuildingContext buildingContext) {
+		this.buildingContext = buildingContext;
 	}
 
-	public SimpleValue(MetadataImplementor metadata, Table table) {
-		this( metadata );
+	public SimpleValue(MetadataBuildingContext buildingContext, Table table) {
+		this( buildingContext );
 		this.table = table;
 	}
 
-	public MetadataImplementor getMetadata() {
-		return metadata;
+	public MetadataImplementor getMetadata(){
+		return buildingContext.getMetadataCollector();
 	}
+
+	public MetadataBuildingContext getMetadataBuildingContext() {
+		return buildingContext;
+	}
+
 
 	@Override
 	public ServiceRegistry getServiceRegistry() {
-		return getMetadata().getMetadataBuildingOptions().getServiceRegistry();
+		return buildingContext.getBootstrapContext().getServiceRegistry();
 	}
 
 	@Override
@@ -179,7 +184,7 @@ public class SimpleValue implements KeyValue {
 	public void setTypeName(String typeName) {
 		if ( typeName != null && typeName.startsWith( AttributeConverterTypeAdapter.NAME_PREFIX ) ) {
 			final String converterClassName = typeName.substring( AttributeConverterTypeAdapter.NAME_PREFIX.length() );
-			final ClassLoaderService cls = getMetadata().getMetadataBuildingOptions()
+			final ClassLoaderService cls = buildingContext.getBootstrapContext().getMetadataBuildingOptions()
 					.getServiceRegistry()
 					.getService( ClassLoaderService.class );
 			try {
@@ -187,7 +192,7 @@ public class SimpleValue implements KeyValue {
 				this.attributeConverterDescriptor = new ClassBasedConverterDescriptor(
 						converterClass,
 						false,
-						( ( InFlightMetadataCollector) getMetadata() ).getClassmateContext()
+						buildingContext.getBootstrapContext().getClassmateContext()
 				);
 				return;
 			}
@@ -301,7 +306,7 @@ public class SimpleValue implements KeyValue {
 		}
 
 		// TODO : we should pass along all settings once "config lifecycle" is hashed out...
-		final ConfigurationService cs = metadata.getMetadataBuildingOptions().getServiceRegistry()
+		final ConfigurationService cs = buildingContext.getBootstrapContext().getServiceRegistry()
 				.getService( ConfigurationService.class );
 
 		params.put(
@@ -445,7 +450,7 @@ public class SimpleValue implements KeyValue {
 			createParameterImpl();
 		}
 
-		Type result = metadata.getTypeResolver().heuristicType( typeName, typeParameters );
+		Type result = getMetadata().getTypeResolver().heuristicType( typeName, typeParameters );
 		// if this is a byte[] version/timestamp, then we need to use RowVersionType
 		// instead of BinaryType (HHH-10413)
 		if ( isVersion && BinaryType.class.isInstance( result ) ) {
@@ -487,7 +492,15 @@ public class SimpleValue implements KeyValue {
 			if ( className == null ) {
 				throw new MappingException( "Attribute types for a dynamic entity must be explicitly specified: " + propertyName );
 			}
-			typeName = ReflectHelper.reflectedPropertyClass( className, propertyName, metadata.getMetadataBuildingOptions().getServiceRegistry().getService( ClassLoaderService.class ) ).getName();
+			typeName = ReflectHelper.reflectedPropertyClass(
+					className,
+					propertyName,
+					buildingContext
+							.getBootstrapContext()
+							.getMetadataBuildingOptions()
+							.getServiceRegistry()
+							.getService( ClassLoaderService.class )
+			).getName();
 			// todo : to fully support isNationalized here we need do the process hinted at above
 			// 		essentially, much of the logic from #buildAttributeConverterTypeAdapter wrt resolving
 			//		a (1) SqlTypeDescriptor, a (2) JavaTypeDescriptor and dynamically building a BasicType
@@ -539,7 +552,9 @@ public class SimpleValue implements KeyValue {
 				new JpaAttributeConverterCreationContext() {
 					@Override
 					public ManagedBeanRegistry getManagedBeanRegistry() {
-						return getMetadata().getMetadataBuildingOptions()
+						return buildingContext
+								.getBootstrapContext()
+								.getMetadataBuildingOptions()
 								.getServiceRegistry()
 								.getService( ManagedBeanRegistry.class );
 					}
@@ -586,7 +601,10 @@ public class SimpleValue implements KeyValue {
 		}
 
 		// find the standard SqlTypeDescriptor for that JDBC type code (allow itr to be remapped if needed!)
-		final SqlTypeDescriptor sqlTypeDescriptor = metadata.getMetadataBuildingOptions().getServiceRegistry()
+		final SqlTypeDescriptor sqlTypeDescriptor = buildingContext
+				.getBootstrapContext()
+				.getMetadataBuildingOptions()
+				.getServiceRegistry()
 				.getService( JdbcServices.class )
 				.getJdbcEnvironment()
 				.getDialect()
@@ -685,7 +703,9 @@ public class SimpleValue implements KeyValue {
 					? null
 					: xProperty.getAnnotations();
 
-			final ClassLoaderService classLoaderService = getMetadata().getMetadataBuildingOptions()
+			final ClassLoaderService classLoaderService = buildingContext
+					.getBootstrapContext()
+					.getMetadataBuildingOptions()
 					.getServiceRegistry()
 					.getService( ClassLoaderService.class );
 			typeParameters.put(

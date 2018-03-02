@@ -57,6 +57,7 @@ import org.hibernate.type.TypeResolver;
  * @since 5.0
  */
 public interface InFlightMetadataCollector extends Mapping, MetadataImplementor {
+	BootstrapContext getBootstrapContext();
 
 	/**
 	 * Add the PersistentClass for an entity mapping.

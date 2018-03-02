@@ -228,7 +228,7 @@ public class EntityManagerFactoryBuilderImpl implements EntityManagerFactoryBuil
 
 		this.managedResources = MetadataBuildingProcess.prepare(
 				metadataSources,
-				metamodelBuilder.getMetadataBuildingOptions()
+				metamodelBuilder.getBootstrapContext()
 		);
 
 		withValidatorFactory( configurationValues.get( org.hibernate.cfg.AvailableSettings.JPA_VALIDATION_FACTORY ) );
@@ -858,7 +858,11 @@ public class EntityManagerFactoryBuilderImpl implements EntityManagerFactoryBuil
 
 	private MetadataImplementor metadata() {
 		if ( this.metadata == null ) {
-			this.metadata = MetadataBuildingProcess.complete( managedResources, metamodelBuilder.getMetadataBuildingOptions() );
+			this.metadata = MetadataBuildingProcess.complete(
+					managedResources,
+					metamodelBuilder.getBootstrapContext(),
+					metamodelBuilder.getMetadataBuildingOptions()
+			);
 		}
 		return metadata;
 	}

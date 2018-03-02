@@ -126,9 +126,9 @@ public class EntityBinder {
 	private String where;
 	// todo : we should defer to InFlightMetadataCollector.EntityTableXref for secondary table tracking;
 	//		atm we use both from here; HBM binding solely uses InFlightMetadataCollector.EntityTableXref
-	private java.util.Map<String, Join> secondaryTables = new HashMap<String, Join>();
-	private java.util.Map<String, Object> secondaryTableJoins = new HashMap<String, Object>();
-	private List<Filter> filters = new ArrayList<Filter>();
+	private java.util.Map<String, Join> secondaryTables = new HashMap<>();
+	private java.util.Map<String, Object> secondaryTableJoins = new HashMap<>();
+	private List<Filter> filters = new ArrayList<>();
 	private InheritanceState inheritanceState;
 	private boolean ignoreIdAnnotations;
 	private AccessType propertyAccessType = AccessType.DEFAULT;
@@ -331,7 +331,7 @@ public class EntityBinder {
 			org.hibernate.annotations.Entity entityAnn = annotatedClass.getAnnotation( org.hibernate.annotations.Entity.class );
 			if ( entityAnn != null && !BinderHelper.isEmptyAnnotationValue( entityAnn.persister() ) ) {
 				try {
-					persister = context.getClassLoaderAccess().classForName( entityAnn.persister() );
+					persister = context.getBootstrapContext().getClassLoaderAccess().classForName( entityAnn.persister() );
 				}
 				catch (ClassLoadingException e) {
 					throw new AnnotationException( "Could not find persister class: " + entityAnn.persister(), e );
@@ -960,7 +960,7 @@ public class EntityBinder {
 	}
 
 	private void bindJoinToPersistentClass(Join join, Ejb3JoinColumn[] ejb3JoinColumns, MetadataBuildingContext buildingContext) {
-		SimpleValue key = new DependantValue( buildingContext.getMetadataCollector(), join.getTable(), persistentClass.getIdentifier() );
+		SimpleValue key = new DependantValue( buildingContext, join.getTable(), persistentClass.getIdentifier() );
 		join.setKey( key );
 		setFKNameIfDefined( join );
 		key.setCascadeDeleteEnabled( false );
@@ -1052,23 +1052,6 @@ public class EntityBinder {
 		return addJoin( null, joinTable, holder, noDelayInPkColumnCreation );
 	}
 
-	private static class SecondaryTableNameSource implements ObjectNameSource {
-		// always has an explicit name
-		private final String explicitName;
-
-		private SecondaryTableNameSource(String explicitName) {
-			this.explicitName = explicitName;
-		}
-
-		public String getExplicitName() {
-			return explicitName;
-		}
-
-		public String getLogicalName() {
-			return explicitName;
-		}
-	}
-
 	private static class SecondaryTableNamingStrategyHelper implements NamingStrategyHelper {
 		@Override
 		public Identifier determineImplicitName(MetadataBuildingContext buildingContext) {
@@ -1107,7 +1090,6 @@ public class EntityBinder {
 
 		final String schema;
 		final String catalog;
-		final SecondaryTableNameSource secondaryTableNameContext;
 		final Object joinColumns;
 		final List<UniqueConstraintHolder> uniqueConstraintHolders;
 

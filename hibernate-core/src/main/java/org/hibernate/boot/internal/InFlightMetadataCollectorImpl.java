@@ -51,6 +51,7 @@ import org.hibernate.boot.model.relational.Namespace;
 import org.hibernate.boot.model.source.internal.ImplicitColumnNamingSecondPass;
 import org.hibernate.boot.model.source.spi.LocalMetadataBuildingContext;
 import org.hibernate.boot.model.convert.spi.ConverterAutoApplyHandler;
+import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.boot.spi.InFlightMetadataCollector;
 import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.boot.spi.MetadataBuildingOptions;
@@ -116,6 +117,7 @@ import org.hibernate.type.TypeResolver;
 public class InFlightMetadataCollectorImpl implements InFlightMetadataCollector {
 	private static final CoreMessageLogger log = CoreLogging.messageLogger( InFlightMetadataCollectorImpl.class );
 
+	private final BootstrapContext bootstrapContext;
 	private final MetadataBuildingOptions options;
 	private final TypeResolver typeResolver;
 
@@ -163,8 +165,10 @@ public class InFlightMetadataCollectorImpl implements InFlightMetadataCollector 
 	private Map<Table, List<JPAIndexHolder>> jpaIndexHoldersByTable;
 
 	public InFlightMetadataCollectorImpl(
+			BootstrapContext bootstrapContext,
 			MetadataBuildingOptions options,
 			TypeResolver typeResolver) {
+		this.bootstrapContext = bootstrapContext;
 		this.uuid = UUID.randomUUID();
 		this.options = options;
 		this.typeResolver = typeResolver;
@@ -194,6 +198,11 @@ public class InFlightMetadataCollectorImpl implements InFlightMetadataCollector 
 	@Override
 	public MetadataBuildingOptions getMetadataBuildingOptions() {
 		return options;
+	}
+
+	@Override
+	public BootstrapContext getBootstrapContext() {
+		return bootstrapContext;
 	}
 
 	@Override

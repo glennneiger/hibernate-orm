@@ -277,8 +277,8 @@ public class BinderHelper {
 			if ( properties != null ) {
                         //todo how about properties.size() == 1, this should be much simpler
 				Component embeddedComp = columnOwner instanceof PersistentClass ?
-						new Component( context.getMetadataCollector(), (PersistentClass) columnOwner ) :
-						new Component( context.getMetadataCollector(), (Join) columnOwner );
+						new Component( context, (PersistentClass) columnOwner ) :
+						new Component( context, (Join) columnOwner );
 				embeddedComp.setEmbedded( true );
 				embeddedComp.setComponentClassName( embeddedComp.getOwner().getClassName() );
 				for (Property property : properties) {
@@ -946,7 +946,7 @@ public class BinderHelper {
 			boolean optional,
 			MetadataBuildingContext context) {
 		//All FK columns should be in the same table
-		Any value = new Any( context.getMetadataCollector(), columns[0].getTable() );
+		Any value = new Any( context, columns[0].getTable() );
 		AnyMetaDef metaAnnDef = inferredData.getProperty().getAnnotation( AnyMetaDef.class );
 
 		if ( metaAnnDef != null ) {

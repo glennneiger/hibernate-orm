@@ -120,7 +120,6 @@ import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 import org.hibernate.annotations.Where;
 import org.hibernate.annotations.common.reflection.ClassLoadingException;
-import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XMethod;
@@ -579,7 +578,7 @@ public final class AnnotationBinder {
 		String schema = "";
 		String table = ""; //might be no @Table annotation on the annotated class
 		String catalog = "";
-		List<UniqueConstraintHolder> uniqueConstraints = new ArrayList<UniqueConstraintHolder>();
+		List<UniqueConstraintHolder> uniqueConstraints = new ArrayList<>();
 		javax.persistence.Table tabAnn = null;
 		if ( clazzToProcess.isAnnotationPresent( javax.persistence.Table.class ) ) {
 			tabAnn = clazzToProcess.getAnnotation( javax.persistence.Table.class );
@@ -686,7 +685,7 @@ public final class AnnotationBinder {
 			if ( inheritanceState.hasParents() ) {
 				onDeleteAppropriate = true;
 				final JoinedSubclass jsc = ( JoinedSubclass ) persistentClass;
-				SimpleValue key = new DependantValue( context.getMetadataCollector(), jsc.getTable(), jsc.getIdentifier() );
+				SimpleValue key = new DependantValue( context, jsc.getTable(), jsc.getIdentifier() );
 				jsc.setKey( key );
 				ForeignKey fk = clazzToProcess.getAnnotation( ForeignKey.class );
 				if ( fk != null && !BinderHelper.isEmptyAnnotationValue( fk.name() ) ) {
@@ -954,7 +953,7 @@ public final class AnnotationBinder {
 			InheritanceState.ElementsToProcess elementsToProcess,
 			boolean subclassAndSingleTableStrategy,
 			Set<String> idPropertiesIfIdClass) {
-		Set<String> missingIdProperties = new HashSet<String>( idPropertiesIfIdClass );
+		Set<String> missingIdProperties = new HashSet<>( idPropertiesIfIdClass );
 		for ( PropertyData propertyAnnotatedElement : elementsToProcess.getElements() ) {
 			String propertyName = propertyAnnotatedElement.getPropertyName();
 			if ( !idPropertiesIfIdClass.contains( propertyName ) ) {
@@ -1337,7 +1336,7 @@ public final class AnnotationBinder {
 	}
 
 	private static void bindFilterDef(FilterDef defAnn, MetadataBuildingContext context) {
-		Map<String, org.hibernate.type.Type> params = new HashMap<String, org.hibernate.type.Type>();
+		Map<String, org.hibernate.type.Type> params = new HashMap<>();
 		for ( ParamDef param : defAnn.parameters() ) {
 			params.put( param.name(), context.getMetadataCollector().getTypeResolver().heuristicType( param.type() ) );
 		}
@@ -1446,7 +1445,7 @@ public final class AnnotationBinder {
 			}
 			discriminatorColumn.setJoins( secondaryTables );
 			discriminatorColumn.setPropertyHolder( propertyHolder );
-			SimpleValue discriminatorColumnBinding = new SimpleValue( context.getMetadataCollector(), rootClass.getTable() );
+			SimpleValue discriminatorColumnBinding = new SimpleValue( context, rootClass.getTable() );
 			rootClass.setDiscriminator( discriminatorColumnBinding );
 			discriminatorColumn.linkWithValue( discriminatorColumnBinding );
 			discriminatorColumnBinding.setTypeName( discriminatorColumn.getDiscriminatorTypeName() );
@@ -2624,14 +2623,14 @@ public final class AnnotationBinder {
 		propertyHolder.startingProperty( inferredData.getProperty() );
 
 		final XClass xClassProcessed = inferredData.getPropertyClass();
-		List<PropertyData> classElements = new ArrayList<PropertyData>();
+		List<PropertyData> classElements = new ArrayList<>();
 		XClass returnedClassOrElement = inferredData.getClassOrElement();
 
 		List<PropertyData> baseClassElements = null;
-		Map<String, PropertyData> orderedBaseClassElements = new HashMap<String, PropertyData>();
+		Map<String, PropertyData> orderedBaseClassElements = new HashMap<>();
 		XClass baseReturnedClassOrElement;
 		if ( baseInferredData != null ) {
-			baseClassElements = new ArrayList<PropertyData>();
+			baseClassElements = new ArrayList<>();
 			baseReturnedClassOrElement = baseInferredData.getClassOrElement();
 			bindTypeDefs( baseReturnedClassOrElement, buildingContext );
 			// iterate from base returned class up hierarchy to handle cases where the @Id attributes
@@ -2699,7 +2698,7 @@ public final class AnnotationBinder {
 							? Nullability.NO_CONSTRAINT
 							: Nullability.FORCED_NOT_NULL,
 					propertyAnnotatedElement,
-					new HashMap<String, IdentifierGeneratorDefinition>(),
+					new HashMap<>(),
 					entityBinder,
 					isIdentifierMapper,
 					isComponentEmbedded,
@@ -2742,7 +2741,7 @@ public final class AnnotationBinder {
 			boolean isComponentEmbedded,
 			boolean isIdentifierMapper,
 			MetadataBuildingContext context) {
-		Component comp = new Component( context.getMetadataCollector(), propertyHolder.getPersistentClass() );
+		Component comp = new Component( context, propertyHolder.getPersistentClass() );
 		comp.setEmbedded( isComponentEmbedded );
 		//yuk
 		comp.setTable( propertyHolder.getTable() );
@@ -2785,7 +2784,6 @@ public final class AnnotationBinder {
 		String persistentClassName = rootClass.getClassName();
 		SimpleValue id;
 		final String propertyName = inferredData.getPropertyName();
-		HashMap<String, IdGenerator> localGenerators = new HashMap<String, IdGenerator>();
 		if ( isComposite ) {
 			id = fillComponent(
 					propertyHolder,
@@ -2870,7 +2868,7 @@ public final class AnnotationBinder {
 			PropertyData baseInferredData,
 			AccessType propertyAccessor,
 			MetadataBuildingContext context) {
-		List<PropertyData> baseClassElements = new ArrayList<PropertyData>();
+		List<PropertyData> baseClassElements = new ArrayList<>();
 		XClass baseReturnedClassOrElement = baseInferredData.getClassOrElement();
 		PropertyContainer propContainer = new PropertyContainer(
 				baseReturnedClassOrElement,
@@ -2916,7 +2914,7 @@ public final class AnnotationBinder {
 			PropertyBinder propertyBinder,
 			MetadataBuildingContext context) {
 		//All FK columns should be in the same table
-		org.hibernate.mapping.ManyToOne value = new org.hibernate.mapping.ManyToOne( context.getMetadataCollector(), columns[0].getTable() );
+		org.hibernate.mapping.ManyToOne value = new org.hibernate.mapping.ManyToOne( context, columns[0].getTable() );
 		// This is a @OneToOne mapped to a physical o.h.mapping.ManyToOne
 		if ( unique ) {
 			value.markAsLogicalOneToOne();
@@ -3118,7 +3116,7 @@ public final class AnnotationBinder {
 			}
 			else {
 				Iterator idColumns = identifier.getColumnIterator();
-				List<String> idColumnNames = new ArrayList<String>();
+				List<String> idColumnNames = new ArrayList<>();
 				org.hibernate.mapping.Column currentColumn;
 				if ( identifier.getColumnSpan() != joinColumns.length ) {
 					mapToPK = false;
@@ -3401,8 +3399,7 @@ public final class AnnotationBinder {
 	public static Map<XClass, InheritanceState> buildInheritanceStates(
 			List<XClass> orderedClasses,
 			MetadataBuildingContext buildingContext) {
-		ReflectionManager reflectionManager = buildingContext.getBuildingOptions().getReflectionManager();
-		Map<XClass, InheritanceState> inheritanceStatePerClass = new HashMap<XClass, InheritanceState>(
+		Map<XClass, InheritanceState> inheritanceStatePerClass = new HashMap<>(
 				orderedClasses.size()
 		);
 		for ( XClass clazz : orderedClasses ) {

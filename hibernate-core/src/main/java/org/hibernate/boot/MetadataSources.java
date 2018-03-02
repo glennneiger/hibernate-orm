@@ -130,9 +130,11 @@ public class MetadataSources implements Serializable {
 	 * Get a builder for metadata where non-default options can be specified.
 	 *
 	 * @return The built metadata.
+	 * @deprecated Use {@link #getMetadataBuilder()} instead
 	 */
+	@Deprecated
 	public MetadataBuilder getMetadataBuilder(StandardServiceRegistry serviceRegistry) {
-		MetadataBuilderImpl defaultBuilder = new MetadataBuilderImpl( this, serviceRegistry );
+		MetadataBuilderImpl defaultBuilder = new MetadataBuilderImpl( this );
 		return getCustomBuilderOrDefault( defaultBuilder );
 	}
 
