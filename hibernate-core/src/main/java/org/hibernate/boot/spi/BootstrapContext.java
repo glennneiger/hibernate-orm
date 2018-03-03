@@ -94,18 +94,18 @@ public interface BootstrapContext {
 	 * @return The scanner
 	 */
 	Object getScanner();
-//
-//	/**
-//	 * Retrieve the Hibernate Commons Annotations ReflectionManager to use.
-//	 *
-//	 * @return The Hibernate Commons Annotations ReflectionManager to use.
-//	 *
-//	 * @deprecated Deprecated (with no replacement) to indicate that this will go away as
-//	 * we migrate away from Hibernate Commons Annotations to Jandex for annotation handling
-//	 * and XMl->annotation merging.
-//	 */
-//	ReflectionManager getReflectionManager();
-//
+
+	/**
+	 * Retrieve the Hibernate Commons Annotations ReflectionManager to use.
+	 *
+	 * @return The Hibernate Commons Annotations ReflectionManager to use.
+	 *
+	 * @deprecated Deprecated (with no replacement) to indicate that this will go away as
+	 * we migrate away from Hibernate Commons Annotations to Jandex for annotation handling
+	 * and XMl->annotation merging.
+	 */
+	ReflectionManager getReflectionManager();
+
 //	/**
 //	 * Access to the Jandex index passed by call to
 //	 * {@link org.hibernate.boot.MetadataBuilder#applyIndexView(org.jboss.jandex.IndexView)}, if any.

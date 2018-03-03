@@ -25,6 +25,7 @@ import org.hibernate.boot.model.TypeDefinition;
 import org.hibernate.boot.model.relational.Database;
 import org.hibernate.boot.model.relational.Namespace;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
+import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.boot.spi.MetadataBuildingOptions;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.boot.spi.SessionFactoryBuilderFactory;
@@ -78,6 +79,7 @@ public class MetadataImpl implements MetadataImplementor, Serializable {
 	private final Map<String, NamedEntityGraphDefinition> namedEntityGraphMap;
 	private final Map<String, SQLFunction> sqlFunctionMap;
 	private final Database database;
+	private final BootstrapContext bootstrapContext;
 
 	public MetadataImpl(
 			UUID uuid,
@@ -98,7 +100,8 @@ public class MetadataImpl implements MetadataImplementor, Serializable {
 			Map<String, ResultSetMappingDefinition> sqlResultSetMappingMap,
 			Map<String, NamedEntityGraphDefinition> namedEntityGraphMap,
 			Map<String, SQLFunction> sqlFunctionMap,
-			Database database) {
+			Database database,
+			BootstrapContext bootstrapContext) {
 		this.uuid = uuid;
 		this.metadataBuildingOptions = metadataBuildingOptions;
 		this.typeResolver = typeResolver;
@@ -118,6 +121,7 @@ public class MetadataImpl implements MetadataImplementor, Serializable {
 		this.namedEntityGraphMap = namedEntityGraphMap;
 		this.sqlFunctionMap = sqlFunctionMap;
 		this.database = database;
+		this.bootstrapContext = bootstrapContext;
 	}
 
 	@Override
@@ -132,7 +136,7 @@ public class MetadataImpl implements MetadataImplementor, Serializable {
 
 	@Override
 	public SessionFactoryBuilder getSessionFactoryBuilder() {
-		final SessionFactoryBuilderImpl defaultBuilder = new SessionFactoryBuilderImpl( this );
+		final SessionFactoryBuilderImpl defaultBuilder = new SessionFactoryBuilderImpl( this, bootstrapContext );
 
 		final ClassLoaderService cls = metadataBuildingOptions.getServiceRegistry().getService( ClassLoaderService.class );
 		final java.util.Collection<SessionFactoryBuilderFactory> discoveredBuilderFactories = cls.loadJavaServices( SessionFactoryBuilderFactory.class );

@@ -19,15 +19,10 @@ import javax.persistence.SharedCacheMode;
 import org.hibernate.HibernateException;
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.common.reflection.ClassLoaderDelegate;
-import org.hibernate.annotations.common.reflection.ClassLoadingException;
-import org.hibernate.annotations.common.reflection.ReflectionManager;
-import org.hibernate.annotations.common.util.StandardClassLoaderDelegateImpl;
 import org.hibernate.boot.AttributeConverterInfo;
 import org.hibernate.boot.CacheRegionDefinition;
 import org.hibernate.boot.MetadataBuilder;
 import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.archive.scan.internal.StandardScanOptions;
 import org.hibernate.boot.archive.scan.spi.ScanEnvironment;
 import org.hibernate.boot.archive.scan.spi.ScanOptions;
 import org.hibernate.boot.archive.scan.spi.Scanner;
@@ -80,8 +75,6 @@ import org.hibernate.usertype.CompositeUserType;
 import org.hibernate.usertype.UserType;
 
 import org.jboss.jandex.IndexView;
-
-import static org.hibernate.internal.log.DeprecationLogger.DEPRECATION_LOGGER;
 
 /**
  * @author Steve Ebersole
@@ -183,12 +176,13 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 		return this;
 	}
 
-	@Override
-	public MetadataBuilder applyReflectionManager(ReflectionManager reflectionManager) {
-		this.options.reflectionManager = reflectionManager;
-		this.options.reflectionManager.injectClassLoaderDelegate( this.options.getHcannClassLoaderDelegate() );
-		return this;
-	}
+//	@Override
+//	public MetadataBuilder applyReflectionManager(ReflectionManager reflectionManager) {
+//		bootstrapContext.
+//		this.options.reflectionManager = reflectionManager;
+//		this.options.reflectionManager.injectClassLoaderDelegate( this.options.getHcannClassLoaderDelegate() );
+//		return this;
+//	}
 
 	@Override
 	public MetadataBuilder applySharedCacheMode(SharedCacheMode sharedCacheMode) {
@@ -210,7 +204,7 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 
 	@Override
 	public MetadataBuilder applyScanOptions(ScanOptions scanOptions) {
-		this.options.scanOptions = scanOptions;
+		this.bootstrapContext.injectScanOptions( scanOptions );
 		return this;
 	}
 
@@ -222,13 +216,13 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 
 	@Override
 	public MetadataBuilder applyScanner(Scanner scanner) {
-		this.options.scannerSetting = scanner;
+		this.bootstrapContext.injectScanner( scanner );
 		return this;
 	}
 
 	@Override
 	public MetadataBuilder applyArchiveDescriptorFactory(ArchiveDescriptorFactory factory) {
-		this.options.archiveDescriptorFactory = factory;
+		this.bootstrapContext.injectArchiveDescriptorFactory( factory );
 		return this;
 	}
 
@@ -309,7 +303,7 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 	@Override
 	public MetadataBuilder applyCacheRegionDefinition(CacheRegionDefinition cacheRegionDefinition) {
 		if ( options.cacheRegionDefinitions == null ) {
-			options.cacheRegionDefinitions = new ArrayList<CacheRegionDefinition>();
+			options.cacheRegionDefinitions = new ArrayList<>();
 		}
 		options.cacheRegionDefinitions.add( cacheRegionDefinition );
 		return this;
@@ -317,7 +311,7 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 
 	@Override
 	public MetadataBuilder applyTempClassLoader(ClassLoader tempClassLoader) {
-		options.tempClassLoader = tempClassLoader;
+		this.bootstrapContext.injectJpaTempClassLoader( tempClassLoader );
 		return this;
 	}
 
@@ -336,7 +330,7 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 	@Override
 	public MetadataBuilder applySqlFunction(String functionName, SQLFunction function) {
 		if ( this.options.sqlFunctionMap == null ) {
-			this.options.sqlFunctionMap = new HashMap<String, SQLFunction>();
+			this.options.sqlFunctionMap = new HashMap<>();
 		}
 		this.options.sqlFunctionMap.put( functionName, function );
 		return this;
@@ -345,7 +339,7 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 	@Override
 	public MetadataBuilder applyAuxiliaryDatabaseObject(AuxiliaryDatabaseObject auxiliaryDatabaseObject) {
 		if ( this.options.auxiliaryDatabaseObjectList == null ) {
-			this.options.auxiliaryDatabaseObjectList = new ArrayList<AuxiliaryDatabaseObject>();
+			this.options.auxiliaryDatabaseObjectList = new ArrayList<>();
 		}
 		this.options.auxiliaryDatabaseObjectList.add( auxiliaryDatabaseObject );
 		return this;
@@ -368,7 +362,11 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 
 					@Override
 					public ConverterDescriptor toConverterDescriptor(MetadataBuildingContext context) {
-						return new ClassBasedConverterDescriptor( attributeConverterClass, null, context.getMetadataCollector().getClassmateContext() );
+						return new ClassBasedConverterDescriptor(
+								attributeConverterClass,
+								null,
+								context.getBootstrapContext().getClassmateContext()
+						);
 					}
 				}
 		);
@@ -386,7 +384,11 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 
 					@Override
 					public ConverterDescriptor toConverterDescriptor(MetadataBuildingContext context) {
-						return new ClassBasedConverterDescriptor( attributeConverterClass, autoApply, context.getMetadataCollector().getClassmateContext() );
+						return new ClassBasedConverterDescriptor(
+								attributeConverterClass,
+								autoApply,
+								context.getBootstrapContext().getClassmateContext()
+						);
 					}
 				}
 		);
@@ -404,7 +406,11 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 
 					@Override
 					public ConverterDescriptor toConverterDescriptor(MetadataBuildingContext context) {
-						return new InstanceBasedConverterDescriptor( attributeConverter, null, context.getMetadataCollector().getClassmateContext() );
+						return new InstanceBasedConverterDescriptor(
+								attributeConverter,
+								null,
+								context.getBootstrapContext().getClassmateContext()
+						);
 					}
 				}
 		);
@@ -422,7 +428,11 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 
 					@Override
 					public ConverterDescriptor toConverterDescriptor(MetadataBuildingContext context) {
-						return new InstanceBasedConverterDescriptor( attributeConverter, autoApply, context.getMetadataCollector().getClassmateContext() );
+						return new InstanceBasedConverterDescriptor(
+								attributeConverter,
+								autoApply,
+								context.getBootstrapContext().getClassmateContext()
+						);
 					}
 				}
 		);
@@ -593,21 +603,12 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 		private final StandardServiceRegistry serviceRegistry;
 		private final MappingDefaultsImpl mappingDefaults;
 
-		private ArrayList<BasicTypeRegistration> basicTypeRegistrations = new ArrayList<BasicTypeRegistration>();
+		private ArrayList<BasicTypeRegistration> basicTypeRegistrations = new ArrayList<>();
 
 		private IndexView jandexView;
-		private ClassLoader tempClassLoader;
-
-		private ScanOptions scanOptions;
-		private ScanEnvironment scanEnvironment;
-		private Object scannerSetting;
-		private ArchiveDescriptorFactory archiveDescriptorFactory;
 
 		private ImplicitNamingStrategy implicitNamingStrategy;
 		private PhysicalNamingStrategy physicalNamingStrategy;
-
-		private ReflectionManager reflectionManager;
-		private ClassLoaderDelegate hcannClassLoaderDelegate;
 
 		private SharedCacheMode sharedCacheMode;
 		private AccessType defaultCacheAccessType;
@@ -622,11 +623,8 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 
 		private HashMap<String,SQLFunction> sqlFunctionMap;
 		private ArrayList<AuxiliaryDatabaseObject> auxiliaryDatabaseObjectList;
-		private HashMap<Class,AttributeConverterInfo> attributeConverterInfoMap;
 
 		private IdGeneratorInterpreterImpl idGenerationTypeInterpreter = new IdGeneratorInterpreterImpl();
-
-		private boolean autoQuoteKeywords;
 
 //		private PersistentAttributeMemberResolver persistentAttributeMemberResolver =
 //				StandardPersistentAttributeMemberResolver.INSTANCE;
@@ -638,25 +636,6 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 			final ConfigurationService configService = serviceRegistry.getService( ConfigurationService.class );
 
 			this.mappingDefaults = new MappingDefaultsImpl( serviceRegistry );
-
-//			jandexView = (IndexView) configService.getSettings().get( AvailableSettings.JANDEX_INDEX );
-
-			this.scanOptions = new StandardScanOptions(
-					(String) configService.getSettings().get( AvailableSettings.SCANNER_DISCOVERY ),
-					false
-			);
-			// ScanEnvironment must be set explicitly
-			this.scannerSetting = configService.getSettings().get( AvailableSettings.SCANNER );
-			if ( this.scannerSetting == null ) {
-				this.scannerSetting = configService.getSettings().get( AvailableSettings.SCANNER_DEPRECATED );
-				if ( this.scannerSetting != null ) {
-					DEPRECATION_LOGGER.logDeprecatedScannerSetting();
-				}
-			}
-			this.archiveDescriptorFactory = strategySelector.resolveStrategy(
-					ArchiveDescriptorFactory.class,
-					configService.getSettings().get( AvailableSettings.SCANNER_ARCHIVE_INTERPRETER )
-			);
 
 			this.multiTenancyStrategy =  MultiTenancyStrategy.determineMultiTenancyStrategy( configService.getSettings() );
 
@@ -734,7 +713,7 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 					configService.getSettings().get( AvailableSettings.IMPLICIT_NAMING_STRATEGY ),
 					new Callable<ImplicitNamingStrategy>() {
 						@Override
-						public ImplicitNamingStrategy call() throws Exception {
+						public ImplicitNamingStrategy call() {
 							return strategySelector.resolveDefaultableStrategy(
 									ImplicitNamingStrategy.class,
 									"default",
@@ -772,7 +751,7 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 		}
 
 		private ArrayList<MetadataSourceType> resolveInitialSourceProcessOrdering(ConfigurationService configService) {
-			final ArrayList<MetadataSourceType> initialSelections = new ArrayList<MetadataSourceType>();
+			final ArrayList<MetadataSourceType> initialSelections = new ArrayList<>();
 
 			final String sourceProcessOrderingSetting = configService.getSetting(
 					AvailableSettings.ARTIFACT_PROCESSING_ORDER,
@@ -780,7 +759,7 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 			);
 			if ( sourceProcessOrderingSetting != null ) {
 				final String[] orderChoices = StringHelper.split( ",; ", sourceProcessOrderingSetting, false );
-				initialSelections.addAll( CollectionHelper.<MetadataSourceType>arrayList( orderChoices.length ) );
+				initialSelections.addAll( CollectionHelper.arrayList( orderChoices.length ) );
 				for ( String orderChoice : orderChoices ) {
 					initialSelections.add( MetadataSourceType.parsePrecedence( orderChoice ) );
 				}
@@ -791,25 +770,6 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 			}
 
 			return initialSelections;
-		}
-
-		public ClassLoaderDelegate getHcannClassLoaderDelegate() {
-			if ( hcannClassLoaderDelegate == null ) {
-				hcannClassLoaderDelegate = new ClassLoaderDelegate() {
-					private final  ClassLoaderService classLoaderService = getServiceRegistry().getService( ClassLoaderService.class );
-
-					@Override
-					public <T> Class<T> classForName(String className) throws ClassLoadingException {
-						try {
-							return classLoaderService.classForName( className );
-						}
-						catch (org.hibernate.boot.registry.classloading.spi.ClassLoadingException e) {
-							return StandardClassLoaderDelegateImpl.INSTANCE.classForName( className );
-						}
-					}
-				};
-			}
-			return hcannClassLoaderDelegate;
 		}
 
 		@Override
@@ -840,11 +800,6 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 		@Override
 		public PhysicalNamingStrategy getPhysicalNamingStrategy() {
 			return physicalNamingStrategy;
-		}
-
-		@Override
-		public ReflectionManager getReflectionManager() {
-			return reflectionManager;
 		}
 
 		@Override
@@ -904,13 +859,13 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 
 		@Override
 		public Map<String, SQLFunction> getSqlFunctions() {
-			return sqlFunctionMap == null ? Collections.<String, SQLFunction>emptyMap() : sqlFunctionMap;
+			return sqlFunctionMap == null ? Collections.emptyMap() : sqlFunctionMap;
 		}
 
 		@Override
 		public List<AuxiliaryDatabaseObject> getAuxiliaryDatabaseObjectList() {
 			return auxiliaryDatabaseObjectList == null
-					? Collections.<AuxiliaryDatabaseObject>emptyList()
+					? Collections.emptyList()
 					: auxiliaryDatabaseObjectList;
 		}
 

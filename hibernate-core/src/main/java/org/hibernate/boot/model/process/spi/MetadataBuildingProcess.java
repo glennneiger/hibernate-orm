@@ -115,7 +115,7 @@ public class MetadataBuildingProcess {
 			final ManagedResources managedResources,
 			final BootstrapContext bootstrapContext,
 			final MetadataBuildingOptions options) {
-		final BasicTypeRegistry basicTypeRegistry = handleTypes( options );
+		final BasicTypeRegistry basicTypeRegistry = handleTypes( bootstrapContext, options );
 
 		final InFlightMetadataCollectorImpl metadataCollector = new InFlightMetadataCollectorImpl(
 				bootstrapContext,
@@ -324,9 +324,7 @@ public class MetadataBuildingProcess {
 //	}
 
 
-
-
-	private static BasicTypeRegistry handleTypes(MetadataBuildingOptions options) {
+	private static BasicTypeRegistry handleTypes(BootstrapContext bootstrapContext, MetadataBuildingOptions options) {
 		final ClassLoaderService classLoaderService = options.getServiceRegistry().getService( ClassLoaderService.class );
 
 		// ultimately this needs to change a little bit to account for HHH-7792

@@ -25,21 +25,21 @@ public interface MetadataBuildingContext {
 	 *
 	 * @return The options
 	 */
-	public MetadataBuildingOptions getBuildingOptions();
+	MetadataBuildingOptions getBuildingOptions();
 
 	/**
 	 * Access to mapping defaults in effect for this context
 	 *
 	 * @return The mapping defaults.
 	 */
-	public MappingDefaults getMappingDefaults();
+	MappingDefaults getMappingDefaults();
 
 	/**
 	 * Access to the collector of metadata as we build it.
 	 *
 	 * @return The metadata collector.
 	 */
-	public InFlightMetadataCollector getMetadataCollector();
+	InFlightMetadataCollector getMetadataCollector();
 
 
 	/**
@@ -47,5 +47,5 @@ public interface MetadataBuildingContext {
 	 *
 	 * @return
 	 */
-	public ObjectNameNormalizer getObjectNameNormalizer();
+	ObjectNameNormalizer getObjectNameNormalizer();
 }

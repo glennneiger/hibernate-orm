@@ -20,6 +20,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.SessionFactoryObserver;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.TempTableDdlTransactionHandling;
+import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.boot.spi.SessionFactoryBuilderImplementor;
 import org.hibernate.boot.spi.SessionFactoryOptions;
@@ -45,10 +46,13 @@ public class SessionFactoryBuilderImpl implements SessionFactoryBuilderImplement
 	private static final Logger log = Logger.getLogger( SessionFactoryBuilderImpl.class );
 
 	private final MetadataImplementor metadata;
+	private final BootstrapContext bootstrapContext;
 	private final SessionFactoryOptionsBuilder optionsBuilder;
 
-	public SessionFactoryBuilderImpl(MetadataImplementor metadata) {
+	public SessionFactoryBuilderImpl(MetadataImplementor metadata, BootstrapContext bootstrapContext) {
 		this.metadata = metadata;
+		this.bootstrapContext = bootstrapContext;
+
 		this.optionsBuilder = new SessionFactoryOptionsBuilder( metadata.getMetadataBuildingOptions().getServiceRegistry() );
 
 		if ( metadata.getSqlFunctionMap() != null ) {
@@ -455,7 +459,7 @@ public class SessionFactoryBuilderImpl implements SessionFactoryBuilderImplement
 	@Override
 	public SessionFactory build() {
 		metadata.validate();
-		return new SessionFactoryImpl( metadata, buildSessionFactoryOptions() );
+		return new SessionFactoryImpl( bootstrapContext, metadata, buildSessionFactoryOptions() );
 	}
 
 	@Override

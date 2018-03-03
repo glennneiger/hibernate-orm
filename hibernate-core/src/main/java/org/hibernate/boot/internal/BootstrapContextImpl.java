@@ -12,10 +12,17 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import org.hibernate.AssertionFailure;
+import org.hibernate.annotations.common.reflection.ClassLoaderDelegate;
+import org.hibernate.annotations.common.reflection.ClassLoadingException;
+import org.hibernate.annotations.common.reflection.ReflectionManager;
+import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
+import org.hibernate.annotations.common.util.StandardClassLoaderDelegateImpl;
 import org.hibernate.boot.AttributeConverterInfo;
+import org.hibernate.boot.CacheRegionDefinition;
 import org.hibernate.boot.archive.scan.internal.StandardScanOptions;
 import org.hibernate.boot.archive.scan.spi.ScanEnvironment;
 import org.hibernate.boot.archive.scan.spi.ScanOptions;
+import org.hibernate.boot.archive.scan.spi.Scanner;
 import org.hibernate.boot.archive.spi.ArchiveDescriptorFactory;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
@@ -23,9 +30,12 @@ import org.hibernate.boot.registry.selector.spi.StrategySelector;
 import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.boot.spi.ClassLoaderAccess;
 import org.hibernate.boot.spi.MetadataBuildingOptions;
+import org.hibernate.cfg.AttributeConverterDefinition;
 import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.cfg.annotations.reflection.JPAMetadataProvider;
 import org.hibernate.engine.config.spi.ConfigurationService;
 
+import org.jboss.jandex.IndexView;
 import org.jboss.logging.Logger;
 
 import static org.hibernate.internal.log.DeprecationLogger.DEPRECATION_LOGGER;
@@ -37,10 +47,14 @@ public class BootstrapContextImpl implements BootstrapContext {
 	private static final Logger log = Logger.getLogger( BootstrapContextImpl.class );
 
 	private final StandardServiceRegistry serviceRegistry;
+
+	private final ClassLoaderAccessImpl classLoaderAccess;
+
+	private final JavaReflectionManager hcannReflectionManager;
 	private final ClassmateContext classmateContext;
 	private final MetadataBuildingOptions metadataBuildingOptions;
+
 	private HashMap<Class,AttributeConverterInfo> attributeConverterInfoMap;
-	private final ClassLoaderAccessImpl classLoaderAccess;
 
 	private ScanOptions scanOptions;
 	private ScanEnvironment scanEnvironment;
@@ -58,6 +72,8 @@ public class BootstrapContextImpl implements BootstrapContext {
 
 		final ClassLoaderService classLoaderService = serviceRegistry.getService( ClassLoaderService.class );
 		this.classLoaderAccess = new ClassLoaderAccessImpl( classLoaderService );
+		this.hcannReflectionManager = generateHcannReflectionManager();
+
 
 		final StrategySelector strategySelector = serviceRegistry.getService( StrategySelector.class );
 		final ConfigurationService configService = serviceRegistry.getService( ConfigurationService.class );
@@ -127,6 +143,11 @@ public class BootstrapContextImpl implements BootstrapContext {
 	}
 
 	@Override
+	public ReflectionManager getReflectionManager() {
+		return hcannReflectionManager;
+	}
+
+	@Override
 	public Collection<AttributeConverterInfo> getAttributeConverters() {
 		return attributeConverterInfoMap != null
 				? new ArrayList<>( attributeConverterInfoMap.values() )
@@ -161,6 +182,10 @@ public class BootstrapContextImpl implements BootstrapContext {
 //		}
 	}
 
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// Mutations
+
+
 	public void addAttributeConverterInfo(AttributeConverterInfo info) {
 		if ( this.attributeConverterInfoMap == null ) {
 			this.attributeConverterInfoMap = new HashMap<>();
@@ -178,14 +203,87 @@ public class BootstrapContextImpl implements BootstrapContext {
 		}
 	}
 
+	void injectJpaTempClassLoader(ClassLoader jpaTempClassLoader) {
+		log.debugf( "Injecting JPA temp ClassLoader [%s] into BootstrapContext; was [%s]", jpaTempClassLoader, this.getJpaTempClassLoader() );
+		this.classLoaderAccess.injectTempClassLoader( jpaTempClassLoader );
+	}
+
+	void injectScanOptions(ScanOptions scanOptions) {
+		log.debugf( "Injecting ScanOptions [%s] into BootstrapContext; was [%s]", scanOptions, this.scanOptions );
+		this.scanOptions = scanOptions;
+	}
+
 	void injectScanEnvironment(ScanEnvironment scanEnvironment) {
-		if ( log.isDebugEnabled() ) {
-			log.debugf(
-					"Injecting ScanEnvironment [%s] into BootstrapContext; was [%s]",
-					scanEnvironment,
-					this.scanEnvironment
-			);
-		}
+		log.debugf( "Injecting ScanEnvironment [%s] into BootstrapContext; was [%s]", scanEnvironment, this.scanEnvironment );
 		this.scanEnvironment = scanEnvironment;
+	}
+
+	void injectScanner(Scanner scanner) {
+		log.debugf( "Injecting Scanner [%s] into BootstrapContext; was [%s]", scanner, this.scannerSetting );
+		this.scannerSetting = scanner;
+	}
+
+	void injectArchiveDescriptorFactory(ArchiveDescriptorFactory factory) {
+		log.debugf( "Injecting ArchiveDescriptorFactory [%s] into BootstrapContext; was [%s]", factory, this.archiveDescriptorFactory );
+		this.archiveDescriptorFactory = factory;
+	}
+
+//	void injectJandexView(IndexView jandexView) {
+//		log.debugf( "Injecting Jandex IndexView [%s] into BootstrapContext; was [%s]", jandexView, this.jandexView );
+//		this.jandexView = jandexView;
+//	}
+//
+//	public void addSqlFunction(String functionName, SqmFunctionTemplate function) {
+//		if ( this.sqlFunctionMap == null ) {
+//			this.sqlFunctionMap = new HashMap<>();
+//		}
+//		this.sqlFunctionMap.put( functionName, function );
+//	}
+//
+//	public void addAuxiliaryDatabaseObject(MappedAuxiliaryDatabaseObject auxiliaryDatabaseObject) {
+//		if ( this.auxiliaryDatabaseObjectList == null ) {
+//			this.auxiliaryDatabaseObjectList = new ArrayList<>();
+//		}
+//		this.auxiliaryDatabaseObjectList.add( auxiliaryDatabaseObject );
+//	}
+//
+//
+//	public void addCacheRegionDefinition(CacheRegionDefinition cacheRegionDefinition) {
+//		if ( cacheRegionDefinitions == null ) {
+//			cacheRegionDefinitions = new ArrayList<>();
+//		}
+//		cacheRegionDefinitions.add( cacheRegionDefinition );
+//	}
+
+	private JavaReflectionManager generateHcannReflectionManager() {
+		final JavaReflectionManager reflectionManager = new JavaReflectionManager();
+		reflectionManager.setMetadataProvider( new JPAMetadataProvider( this ) );
+		reflectionManager.injectClassLoaderDelegate( generateHcannClassLoaderDelegate() );
+		return reflectionManager;
+	}
+
+	private ClassLoaderDelegate generateHcannClassLoaderDelegate() {
+		//	class loading here needs to be drastically different for 7.0
+		//		but luckily 7.0 will do away with HCANN use and be easier to
+		//		implement this.
+		//
+		// todo (6.0) : *if possible* make similar change in 6.0
+		// 		possibly using the JPA temp class loader or create our own "throw awy" ClassLoader;
+		//		the trouble there is that we eventually need to load the Class into the real
+		//		ClassLoader prior to use
+
+		final ClassLoaderService classLoaderService = getServiceRegistry().getService( ClassLoaderService.class );
+
+		return new ClassLoaderDelegate() {
+			@Override
+			public <T> Class<T> classForName(String className) throws ClassLoadingException {
+				try {
+					return classLoaderService.classForName( className );
+				}
+				catch (org.hibernate.boot.registry.classloading.spi.ClassLoadingException e) {
+					return StandardClassLoaderDelegateImpl.INSTANCE.classForName( className );
+				}
+			}
+		};
 	}
 }

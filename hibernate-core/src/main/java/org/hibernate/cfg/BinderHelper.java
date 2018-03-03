@@ -895,7 +895,8 @@ public class BinderHelper {
 					new IdGeneratorStrategyInterpreter.GeneratorNameDeterminationContext() {
 						@Override
 						public Class getIdType() {
-							return buildingContext.getBuildingOptions()
+							return buildingContext
+									.getBootstrapContext()
 									.getReflectionManager()
 									.toClass( idXProperty.getType() );
 						}
@@ -1077,7 +1078,7 @@ public class BinderHelper {
 
 		if ( retrieve ) {
 			return context.getMetadataCollector().getMappedSuperclass(
-					context.getBuildingOptions().getReflectionManager().toClass( declaringClass )
+					context.getBootstrapContext().getReflectionManager().toClass( declaringClass )
 			);
 		}
 		else {
@@ -1096,7 +1097,7 @@ public class BinderHelper {
 			MetadataBuildingContext buildingContext) {
 		final XClass persistentXClass;
 		try {
-			persistentXClass = buildingContext.getBuildingOptions().getReflectionManager()
+			persistentXClass = buildingContext.getBootstrapContext().getReflectionManager()
 					.classForName( propertyHolder.getPersistentClass().getClassName() );
 		}
 		catch ( ClassLoadingException e ) {

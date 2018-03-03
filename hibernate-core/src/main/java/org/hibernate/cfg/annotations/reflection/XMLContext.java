@@ -38,10 +38,10 @@ public class XMLContext implements Serializable {
 	private final BootstrapContext bootstrapContext;
 
 	private Default globalDefaults;
-	private Map<String, Element> classOverriding = new HashMap<String, Element>();
-	private Map<String, Default> defaultsOverriding = new HashMap<String, Default>();
-	private List<Element> defaultElements = new ArrayList<Element>();
-	private List<String> defaultEntityListeners = new ArrayList<String>();
+	private Map<String, Element> classOverriding = new HashMap<>();
+	private Map<String, Default> defaultsOverriding = new HashMap<>();
+	private List<Element> defaultElements = new ArrayList<>();
+	private List<String> defaultEntityListeners = new ArrayList<>();
 	private boolean hasContext = false;
 
 	public XMLContext(BootstrapContext bootstrapContext) {
@@ -55,7 +55,7 @@ public class XMLContext implements Serializable {
 	@SuppressWarnings( "unchecked" )
 	public List<String> addDocument(Document doc) {
 		hasContext = true;
-		List<String> addedClasses = new ArrayList<String>();
+		List<String> addedClasses = new ArrayList<>();
 		Element root = doc.getRootElement();
 		//global defaults
 		Element metadata = root.element( "persistence-unit-metadata" );
@@ -158,7 +158,7 @@ public class XMLContext implements Serializable {
 	}
 
 	private List<String> addEntityListenerClasses(Element element, String packageName, List<String> addedClasses) {
-		List<String> localAddedClasses = new ArrayList<String>();
+		List<String> localAddedClasses = new ArrayList<>();
 		Element listeners = element.element( "entity-listeners" );
 		if ( listeners != null ) {
 			@SuppressWarnings( "unchecked" )

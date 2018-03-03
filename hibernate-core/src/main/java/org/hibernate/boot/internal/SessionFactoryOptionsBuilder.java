@@ -240,8 +240,10 @@ public class SessionFactoryOptionsBuilder implements SessionFactoryOptions {
 		configurationSettings.putAll( jdbcServices.getJdbcEnvironment().getDialect().getDefaultProperties() );
 		//noinspection unchecked
 		configurationSettings.putAll( cfgService.getSettings() );
-		cfgService = new ConfigurationServiceImpl( configurationSettings );
-		( (ConfigurationServiceImpl) cfgService ).injectServices( (ServiceRegistryImplementor) serviceRegistry );
+		if ( cfgService == null ) {
+			cfgService = new ConfigurationServiceImpl( configurationSettings );
+			( (ConfigurationServiceImpl) cfgService ).injectServices( (ServiceRegistryImplementor) serviceRegistry );
+		}
 
 		this.beanManagerReference = configurationSettings.get( "javax.persistence.bean.manager" );
 		this.validatorFactoryReference = configurationSettings.get( "javax.persistence.validation.factory" );

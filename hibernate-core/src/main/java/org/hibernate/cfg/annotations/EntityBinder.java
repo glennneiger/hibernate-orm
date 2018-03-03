@@ -527,7 +527,7 @@ public class EntityBinder {
 				proxyClass = null;
 			}
 			else {
-				final ReflectionManager reflectionManager = context.getBuildingOptions().getReflectionManager();
+				final ReflectionManager reflectionManager = context.getBootstrapContext().getReflectionManager();
 				if ( AnnotationBinder.isDefault( reflectionManager.toXClass( proxy.proxyClass() ), context ) ) {
 					proxyClass = annotatedClass;
 				}

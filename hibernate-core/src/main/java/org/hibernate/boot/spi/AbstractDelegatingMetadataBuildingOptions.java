@@ -12,7 +12,6 @@ import javax.persistence.SharedCacheMode;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MultiTenancyStrategy;
-import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.boot.CacheRegionDefinition;
 import org.hibernate.boot.model.IdGeneratorStrategyInterpreter;
 import org.hibernate.boot.model.naming.ImplicitNamingStrategy;
@@ -72,11 +71,6 @@ public abstract class AbstractDelegatingMetadataBuildingOptions implements Metad
 	@Override
 	public PhysicalNamingStrategy getPhysicalNamingStrategy() {
 		return delegate.getPhysicalNamingStrategy();
-	}
-
-	@Override
-	public ReflectionManager getReflectionManager() {
-		return delegate.getReflectionManager();
 	}
 
 	@Override

@@ -225,7 +225,7 @@ public class MapBinder extends CollectionBinder {
 				}
 				else {
 					try {
-						keyXClass = buildingContext.getBuildingOptions().getReflectionManager().classForName( mapKeyType );
+						keyXClass = buildingContext.getBootstrapContext().getReflectionManager().classForName( mapKeyType );
 					}
 					catch (ClassLoadingException e) {
 						throw new AnnotationException( "Unable to find class: " + mapKeyType, e );

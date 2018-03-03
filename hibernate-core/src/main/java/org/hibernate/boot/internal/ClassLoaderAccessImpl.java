@@ -23,8 +23,8 @@ import org.jboss.logging.Logger;
 public class ClassLoaderAccessImpl implements ClassLoaderAccess {
 	private static final Logger log = Logger.getLogger( ClassLoaderAccessImpl.class );
 
-	private final ClassLoader jpaTempClassLoader;
 	private final ClassLoaderService classLoaderService;
+	private ClassLoader jpaTempClassLoader;
 
 	public ClassLoaderAccessImpl(
 			ClassLoader jpaTempClassLoader,
@@ -39,6 +39,11 @@ public class ClassLoaderAccessImpl implements ClassLoaderAccess {
 
 	public ClassLoaderAccessImpl(ClassLoaderService classLoaderService) {
 		this( null, classLoaderService );
+	}
+
+	public void injectTempClassLoader(ClassLoader jpaTempClassLoader) {
+		log.debugf( "ClassLoaderAccessImpl#injectTempClassLoader(%s) [was %s]", jpaTempClassLoader, this.jpaTempClassLoader );
+		this.jpaTempClassLoader = jpaTempClassLoader;
 	}
 
 	@Override
