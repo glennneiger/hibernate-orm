@@ -59,7 +59,7 @@ public class MetadataBuildingContextTestingImpl implements MetadataBuildingConte
 
 	@Override
 	public BootstrapContext getBootstrapContext() {
-		return null;
+		return bootstrapContext;
 	}
 
 	@Override
