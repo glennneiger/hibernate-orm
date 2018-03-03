@@ -173,12 +173,12 @@ public class BootstrapContextImpl implements BootstrapContext {
 
 	@Override
 	public Map<String, SQLFunction> getSqlFunctions() {
-		return null;
+		return sqlFunctionMap == null ? Collections.emptyMap() : sqlFunctionMap;
 	}
 
 	@Override
 	public Collection<AuxiliaryDatabaseObject> getAuxiliaryDatabaseObjectList() {
-		return null;
+		return auxiliaryDatabaseObjectList == null ? Collections.emptyList() : auxiliaryDatabaseObjectList;
 	}
 
 	@Override
@@ -190,7 +190,7 @@ public class BootstrapContextImpl implements BootstrapContext {
 
 	@Override
 	public Collection<CacheRegionDefinition> getCacheRegionDefinitions() {
-		return null;
+		return cacheRegionDefinitions == null ? Collections.emptyList() : cacheRegionDefinitions;
 	}
 
 	@Override
