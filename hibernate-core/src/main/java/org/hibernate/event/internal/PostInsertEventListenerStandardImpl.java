@@ -17,19 +17,11 @@ import org.hibernate.persister.entity.EntityPersister;
  * @author <a href="mailto:kabir.khan@jboss.org">Kabir Khan</a>
  * @author Steve Ebersole
  */
-public class JpaPostInsertEventListener implements PostInsertEventListener, CallbackRegistryConsumer {
+public class PostInsertEventListenerStandardImpl implements PostInsertEventListener, CallbackRegistryConsumer {
 	private CallbackRegistry callbackRegistry;
 
 	@Override
 	public void injectCallbackRegistry(CallbackRegistry callbackRegistry) {
-		this.callbackRegistry = callbackRegistry;
-	}
-
-	public JpaPostInsertEventListener() {
-		super();
-	}
-
-	public JpaPostInsertEventListener(CallbackRegistry callbackRegistry) {
 		this.callbackRegistry = callbackRegistry;
 	}
 
