@@ -303,14 +303,8 @@ public class CascadingActions {
 				EventSource session,
 				CollectionType collectionType,
 				Object collection) {
-			// in merging with DefaultPersistEventListener...
-			if ( session.getFactory().getSessionFactoryOptions().isJpaBootstrap() ) {
-				return getAllElementsIterator( session, collectionType, collection );
-			}
-			else {
-				// persists don't cascade to uninitialized collections
-				return getLoadedElementsIterator( session, collectionType, collection );
-			}
+			// persists don't cascade to uninitialized collections
+			return getLoadedElementsIterator( session, collectionType, collection );
 		}
 
 		@Override
@@ -352,14 +346,8 @@ public class CascadingActions {
 				EventSource session,
 				CollectionType collectionType,
 				Object collection) {
-			// in merging with DefaultPersistEventListener...
-			if ( session.getFactory().getSessionFactoryOptions().isJpaBootstrap() ) {
-				return getAllElementsIterator( session, collectionType, collection );
-			}
-			else {
-				// persists don't cascade to uninitialized collections
-				return getLoadedElementsIterator( session, collectionType, collection );
-			}
+			// persists don't cascade to uninitialized collections
+			return getLoadedElementsIterator( session, collectionType, collection );
 		}
 
 		@Override
