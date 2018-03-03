@@ -8,10 +8,7 @@ package org.hibernate.boot.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import javax.persistence.AttributeConverter;
 import javax.persistence.SharedCacheMode;
@@ -302,10 +299,7 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 
 	@Override
 	public MetadataBuilder applyCacheRegionDefinition(CacheRegionDefinition cacheRegionDefinition) {
-		if ( options.cacheRegionDefinitions == null ) {
-			options.cacheRegionDefinitions = new ArrayList<>();
-		}
-		options.cacheRegionDefinitions.add( cacheRegionDefinition );
+		this.bootstrapContext.addCacheRegionDefinition( cacheRegionDefinition );
 		return this;
 	}
 
@@ -329,19 +323,13 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 
 	@Override
 	public MetadataBuilder applySqlFunction(String functionName, SQLFunction function) {
-		if ( this.options.sqlFunctionMap == null ) {
-			this.options.sqlFunctionMap = new HashMap<>();
-		}
-		this.options.sqlFunctionMap.put( functionName, function );
+		this.bootstrapContext.addSqlFunction( functionName, function );
 		return this;
 	}
 
 	@Override
 	public MetadataBuilder applyAuxiliaryDatabaseObject(AuxiliaryDatabaseObject auxiliaryDatabaseObject) {
-		if ( this.options.auxiliaryDatabaseObjectList == null ) {
-			this.options.auxiliaryDatabaseObjectList = new ArrayList<>();
-		}
-		this.options.auxiliaryDatabaseObjectList.add( auxiliaryDatabaseObject );
+		this.bootstrapContext.addAuxiliaryDatabaseObject( auxiliaryDatabaseObject );
 		return this;
 	}
 
@@ -611,16 +599,12 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 		private SharedCacheMode sharedCacheMode;
 		private AccessType defaultCacheAccessType;
 		private MultiTenancyStrategy multiTenancyStrategy;
-		private ArrayList<CacheRegionDefinition> cacheRegionDefinitions;
 		private boolean explicitDiscriminatorsForJoinedInheritanceSupported;
 		private boolean implicitDiscriminatorsForJoinedInheritanceSupported;
 		private boolean implicitlyForceDiscriminatorInSelect;
 		private boolean useNationalizedCharacterData;
 		private boolean specjProprietarySyntaxEnabled;
 		private ArrayList<MetadataSourceType> sourceProcessOrdering;
-
-		private HashMap<String,SQLFunction> sqlFunctionMap;
-		private ArrayList<AuxiliaryDatabaseObject> auxiliaryDatabaseObjectList;
 
 		private IdGeneratorInterpreterImpl idGenerationTypeInterpreter = new IdGeneratorInterpreterImpl();
 
@@ -816,11 +800,6 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 		}
 
 		@Override
-		public List<CacheRegionDefinition> getCacheRegionDefinitions() {
-			return cacheRegionDefinitions;
-		}
-
-		@Override
 		public boolean ignoreExplicitDiscriminatorsForJoinedInheritance() {
 			return !explicitDiscriminatorsForJoinedInheritanceSupported;
 		}
@@ -848,18 +827,6 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 		@Override
 		public List<MetadataSourceType> getSourceProcessOrdering() {
 			return sourceProcessOrdering;
-		}
-
-		@Override
-		public Map<String, SQLFunction> getSqlFunctions() {
-			return sqlFunctionMap == null ? Collections.emptyMap() : sqlFunctionMap;
-		}
-
-		@Override
-		public List<AuxiliaryDatabaseObject> getAuxiliaryDatabaseObjectList() {
-			return auxiliaryDatabaseObjectList == null
-					? Collections.emptyList()
-					: auxiliaryDatabaseObjectList;
 		}
 
 		/**

@@ -172,7 +172,7 @@ public class InFlightMetadataCollectorImpl implements InFlightMetadataCollector 
 
 		this.identifierGeneratorFactory = options.getServiceRegistry().getService( MutableIdentifierGeneratorFactory.class );
 
-		for ( Map.Entry<String, SQLFunction> sqlFunctionEntry : options.getSqlFunctions().entrySet() ) {
+		for ( Map.Entry<String, SQLFunction> sqlFunctionEntry : bootstrapContext.getSqlFunctions().entrySet() ) {
 			if ( sqlFunctionMap == null ) {
 				// we need this to be a ConcurrentHashMap for the one we ultimately pass along to the SF
 				// but is this the reference that gets passed along?
@@ -181,10 +181,7 @@ public class InFlightMetadataCollectorImpl implements InFlightMetadataCollector 
 			sqlFunctionMap.put( sqlFunctionEntry.getKey(), sqlFunctionEntry.getValue() );
 		}
 
-		for ( AuxiliaryDatabaseObject auxiliaryDatabaseObject : options.getAuxiliaryDatabaseObjectList() ) {
-			getDatabase().addAuxiliaryDatabaseObject( auxiliaryDatabaseObject );
-		}
-
+		bootstrapContext.getAuxiliaryDatabaseObjectList().forEach( getDatabase()::addAuxiliaryDatabaseObject );
 	}
 
 	@Override
@@ -2132,11 +2129,11 @@ public class InFlightMetadataCollectorImpl implements InFlightMetadataCollector 
 	}
 
 	private void processCachingOverrides() {
-		if ( options.getCacheRegionDefinitions() == null ) {
+		if ( bootstrapContext.getCacheRegionDefinitions() == null ) {
 			return;
 		}
 
-		for ( CacheRegionDefinition cacheRegionDefinition : options.getCacheRegionDefinitions() ) {
+		for ( CacheRegionDefinition cacheRegionDefinition : bootstrapContext.getCacheRegionDefinitions() ) {
 			if ( cacheRegionDefinition.getRegionType() == CacheRegionDefinition.CacheRegionType.ENTITY ) {
 				final PersistentClass entityBinding = getEntityBinding( cacheRegionDefinition.getRole() );
 				if ( entityBinding == null ) {

@@ -89,11 +89,6 @@ public abstract class AbstractDelegatingMetadataBuildingOptions implements Metad
 	}
 
 	@Override
-	public List<CacheRegionDefinition> getCacheRegionDefinitions() {
-		return delegate.getCacheRegionDefinitions();
-	}
-
-	@Override
 	public boolean ignoreExplicitDiscriminatorsForJoinedInheritance() {
 		return delegate.ignoreExplicitDiscriminatorsForJoinedInheritance();
 	}
@@ -121,16 +116,6 @@ public abstract class AbstractDelegatingMetadataBuildingOptions implements Metad
 	@Override
 	public List<MetadataSourceType> getSourceProcessOrdering() {
 		return delegate.getSourceProcessOrdering();
-	}
-
-	@Override
-	public Map<String, SQLFunction> getSqlFunctions() {
-		return delegate.getSqlFunctions();
-	}
-
-	@Override
-	public List<AuxiliaryDatabaseObject> getAuxiliaryDatabaseObjectList() {
-		return delegate.getAuxiliaryDatabaseObjectList();
 	}
 
 	@Override

@@ -17,8 +17,9 @@ import org.hibernate.boot.archive.scan.spi.ScanEnvironment;
 import org.hibernate.boot.archive.scan.spi.ScanOptions;
 import org.hibernate.boot.archive.spi.ArchiveDescriptorFactory;
 import org.hibernate.boot.internal.ClassmateContext;
+import org.hibernate.boot.model.relational.AuxiliaryDatabaseObject;
 import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.cfg.AttributeConverterDefinition;
+import org.hibernate.dialect.function.SQLFunction;
 
 import org.jboss.jandex.IndexView;
 
@@ -116,6 +117,26 @@ public interface BootstrapContext {
 	IndexView getJandexView();
 
 	/**
+	 * Access to any SQL functions explicitly registered with the MetadataBuilder.  This
+	 * does not include Dialect defined functions, etc.
+	 * <p/>
+	 * Should never return {@code null}
+	 *
+	 * @return The SQLFunctions registered through MetadataBuilder
+	 */
+	Map<String,SQLFunction> getSqlFunctions();
+
+	/**
+	 * Access to any AuxiliaryDatabaseObject explicitly registered with the MetadataBuilder.  This
+	 * does not include AuxiliaryDatabaseObject defined in mappings.
+	 * <p/>
+	 * Should never return {@code null}
+	 *
+	 * @return The AuxiliaryDatabaseObject registered through MetadataBuilder
+	 */
+	Collection<AuxiliaryDatabaseObject> getAuxiliaryDatabaseObjectList();
+
+	/**
 	 * Access to collected AttributeConverter definitions.
 	 * <p/>
 	 * Should never return {@code null}
@@ -123,15 +144,15 @@ public interface BootstrapContext {
 	 * @return
 	 */
 	Collection<AttributeConverterInfo> getAttributeConverters();
-//
-//	/**
-//	 * Access to all explicit cache region mappings.
-//	 * <p/>
-//	 * Should never return {@code null}
-//	 *
-//	 * @return Explicit cache region mappings
-//	 */
-//	Collection<CacheRegionDefinition> getCacheRegionDefinitions();
+
+	/**
+	 * Access to all explicit cache region mappings.
+	 * <p/>
+	 * Should never return {@code null}
+	 *
+	 * @return Explicit cache region mappings
+	 */
+	Collection<CacheRegionDefinition> getCacheRegionDefinitions();
 
 	/**
 	 * Releases the "bootstrap only" resources held by this BootstrapContext.

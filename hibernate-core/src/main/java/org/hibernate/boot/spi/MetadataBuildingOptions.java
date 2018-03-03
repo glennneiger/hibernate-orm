@@ -7,22 +7,15 @@
 package org.hibernate.boot.spi;
 
 import java.util.List;
-import java.util.Map;
 import javax.persistence.SharedCacheMode;
 
 import org.hibernate.MultiTenancyStrategy;
-import org.hibernate.annotations.common.reflection.ReflectionManager;
-import org.hibernate.boot.CacheRegionDefinition;
 import org.hibernate.boot.model.IdGeneratorStrategyInterpreter;
 import org.hibernate.boot.model.naming.ImplicitNamingStrategy;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
-import org.hibernate.boot.model.relational.AuxiliaryDatabaseObject;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.cache.spi.access.AccessType;
 import org.hibernate.cfg.MetadataSourceType;
-import org.hibernate.dialect.function.SQLFunction;
-
-import org.jboss.jandex.IndexView;
 
 /**
  * Describes the options used while building the Metadata object (during
@@ -89,13 +82,6 @@ public interface MetadataBuildingOptions {
 	IdGeneratorStrategyInterpreter getIdGenerationTypeInterpreter();
 
 	/**
-	 * Access to all explicit cache region mappings.
-	 *
-	 * @return Explicit cache region mappings.
-	 */
-	List<CacheRegionDefinition> getCacheRegionDefinitions();
-
-	/**
 	 * Whether explicit discriminator declarations should be ignored for joined
 	 * subclass style inheritance.
 	 *
@@ -148,22 +134,6 @@ public interface MetadataBuildingOptions {
 	 * @return The order in which sources should be processed.
 	 */
 	List<MetadataSourceType> getSourceProcessOrdering();
-
-	/**
-	 * Access to any SQL functions explicitly registered with the MetadataBuilder.  This
-	 * does not include Dialect defined functions, etc.
-	 *
-	 * @return The SQLFunctions registered through MetadataBuilder
-	 */
-	Map<String,SQLFunction> getSqlFunctions();
-
-	/**
-	 * Access to any AuxiliaryDatabaseObject explicitly registered with the MetadataBuilder.  This
-	 * does not include AuxiliaryDatabaseObject defined in mappings.
-	 *
-	 * @return The AuxiliaryDatabaseObject registered through MetadataBuilder
-	 */
-	List<AuxiliaryDatabaseObject> getAuxiliaryDatabaseObjectList();
 
 //	/**
 //	 * Obtain the selected strategy for resolving members identifying persistent attributes

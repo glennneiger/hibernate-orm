@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ClassLoaderDelegate;
@@ -24,6 +25,7 @@ import org.hibernate.boot.archive.scan.spi.ScanEnvironment;
 import org.hibernate.boot.archive.scan.spi.ScanOptions;
 import org.hibernate.boot.archive.scan.spi.Scanner;
 import org.hibernate.boot.archive.spi.ArchiveDescriptorFactory;
+import org.hibernate.boot.model.relational.AuxiliaryDatabaseObject;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.boot.registry.selector.spi.StrategySelector;
@@ -33,6 +35,7 @@ import org.hibernate.boot.spi.MetadataBuildingOptions;
 import org.hibernate.cfg.AttributeConverterDefinition;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.annotations.reflection.JPAMetadataProvider;
+import org.hibernate.dialect.function.SQLFunction;
 import org.hibernate.engine.config.spi.ConfigurationService;
 
 import org.jboss.jandex.IndexView;
@@ -56,15 +59,17 @@ public class BootstrapContextImpl implements BootstrapContext {
 
 	private boolean isJpaBootstrap;
 
-	private HashMap<Class,AttributeConverterInfo> attributeConverterInfoMap;
-
 	private ScanOptions scanOptions;
 	private ScanEnvironment scanEnvironment;
 	private Object scannerSetting;
-
 	private ArchiveDescriptorFactory archiveDescriptorFactory;
 
 	private IndexView jandexView;
+
+	private HashMap<String,SQLFunction> sqlFunctionMap;
+	private ArrayList<AuxiliaryDatabaseObject> auxiliaryDatabaseObjectList;
+	private HashMap<Class,AttributeConverterInfo> attributeConverterInfoMap;
+	private ArrayList<CacheRegionDefinition> cacheRegionDefinitions;
 
 	public BootstrapContextImpl(
 			StandardServiceRegistry serviceRegistry,
@@ -167,10 +172,25 @@ public class BootstrapContextImpl implements BootstrapContext {
 	}
 
 	@Override
+	public Map<String, SQLFunction> getSqlFunctions() {
+		return null;
+	}
+
+	@Override
+	public Collection<AuxiliaryDatabaseObject> getAuxiliaryDatabaseObjectList() {
+		return null;
+	}
+
+	@Override
 	public Collection<AttributeConverterInfo> getAttributeConverters() {
 		return attributeConverterInfoMap != null
 				? new ArrayList<>( attributeConverterInfoMap.values() )
 				: Collections.emptyList();
+	}
+
+	@Override
+	public Collection<CacheRegionDefinition> getCacheRegionDefinitions() {
+		return null;
 	}
 
 	@Override
@@ -184,21 +204,21 @@ public class BootstrapContextImpl implements BootstrapContext {
 		archiveDescriptorFactory = null;
 		jandexView = null;
 
-//		if ( sqlFunctionMap != null ) {
-//			sqlFunctionMap.clear();
-//		}
-//
-//		if ( auxiliaryDatabaseObjectList != null ) {
-//			auxiliaryDatabaseObjectList.clear();
-//		}
-//
-//		if ( attributeConverterDefinitionsByClass != null ) {
-//			attributeConverterDefinitionsByClass.clear();
-//		}
-//
-//		if ( cacheRegionDefinitions != null ) {
-//			cacheRegionDefinitions.clear();
-//		}
+		if ( sqlFunctionMap != null ) {
+			sqlFunctionMap.clear();
+		}
+
+		if ( auxiliaryDatabaseObjectList != null ) {
+			auxiliaryDatabaseObjectList.clear();
+		}
+
+		if ( attributeConverterInfoMap != null ) {
+			attributeConverterInfoMap.clear();
+		}
+
+		if ( cacheRegionDefinitions != null ) {
+			cacheRegionDefinitions.clear();
+		}
 	}
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -252,27 +272,27 @@ public class BootstrapContextImpl implements BootstrapContext {
 		this.jandexView = jandexView;
 	}
 
-//	public void addSqlFunction(String functionName, SqmFunctionTemplate function) {
-//		if ( this.sqlFunctionMap == null ) {
-//			this.sqlFunctionMap = new HashMap<>();
-//		}
-//		this.sqlFunctionMap.put( functionName, function );
-//	}
-//
-//	public void addAuxiliaryDatabaseObject(MappedAuxiliaryDatabaseObject auxiliaryDatabaseObject) {
-//		if ( this.auxiliaryDatabaseObjectList == null ) {
-//			this.auxiliaryDatabaseObjectList = new ArrayList<>();
-//		}
-//		this.auxiliaryDatabaseObjectList.add( auxiliaryDatabaseObject );
-//	}
-//
-//
-//	public void addCacheRegionDefinition(CacheRegionDefinition cacheRegionDefinition) {
-//		if ( cacheRegionDefinitions == null ) {
-//			cacheRegionDefinitions = new ArrayList<>();
-//		}
-//		cacheRegionDefinitions.add( cacheRegionDefinition );
-//	}
+	public void addSqlFunction(String functionName, SQLFunction function) {
+		if ( this.sqlFunctionMap == null ) {
+			this.sqlFunctionMap = new HashMap<>();
+		}
+		this.sqlFunctionMap.put( functionName, function );
+	}
+
+	public void addAuxiliaryDatabaseObject(AuxiliaryDatabaseObject auxiliaryDatabaseObject) {
+		if ( this.auxiliaryDatabaseObjectList == null ) {
+			this.auxiliaryDatabaseObjectList = new ArrayList<>();
+		}
+		this.auxiliaryDatabaseObjectList.add( auxiliaryDatabaseObject );
+	}
+
+
+	public void addCacheRegionDefinition(CacheRegionDefinition cacheRegionDefinition) {
+		if ( cacheRegionDefinitions == null ) {
+			cacheRegionDefinitions = new ArrayList<>();
+		}
+		cacheRegionDefinitions.add( cacheRegionDefinition );
+	}
 
 	private JavaReflectionManager generateHcannReflectionManager() {
 		final JavaReflectionManager reflectionManager = new JavaReflectionManager();
