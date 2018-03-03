@@ -137,7 +137,7 @@ public class MetadataBuildingProcess {
 			);
 		}
 
-		final IndexView jandexView = options.getJandexView();
+		final IndexView jandexView = bootstrapContext.getJandexView();
 
 		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		// Set up the processors and start binding

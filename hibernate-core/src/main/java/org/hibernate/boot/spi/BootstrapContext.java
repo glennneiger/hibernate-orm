@@ -105,17 +105,16 @@ public interface BootstrapContext {
 	 */
 	ReflectionManager getReflectionManager();
 
-//	/**
-//	 * Access to the Jandex index passed by call to
-//	 * {@link org.hibernate.boot.MetadataBuilder#applyIndexView(org.jboss.jandex.IndexView)}, if any.
-//	 * <p/>
-//	 * Note that Jandex is currently not used.  See https://github.com/hibernate/hibernate-orm/wiki/Roadmap7.0
-//	 *
-//	 * @return The Jandex index
-//	 */
-//	IndexView getJandexView();
-//
-//
+	/**
+	 * Access to the Jandex index passed by call to
+	 * {@link org.hibernate.boot.MetadataBuilder#applyIndexView(org.jboss.jandex.IndexView)}, if any.
+	 * <p/>
+	 * Note that Jandex is currently not used.  See https://github.com/hibernate/hibernate-orm/wiki/Roadmap7.0
+	 *
+	 * @return The Jandex index
+	 */
+	IndexView getJandexView();
+
 	/**
 	 * Access to collected AttributeConverter definitions.
 	 * <p/>

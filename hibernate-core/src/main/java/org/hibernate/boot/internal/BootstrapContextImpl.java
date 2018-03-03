@@ -64,6 +64,8 @@ public class BootstrapContextImpl implements BootstrapContext {
 
 	private ArchiveDescriptorFactory archiveDescriptorFactory;
 
+	private IndexView jandexView;
+
 	public BootstrapContextImpl(
 			StandardServiceRegistry serviceRegistry,
 			ClassmateContext classmateContext,
@@ -160,6 +162,11 @@ public class BootstrapContextImpl implements BootstrapContext {
 	}
 
 	@Override
+	public IndexView getJandexView() {
+		return jandexView;
+	}
+
+	@Override
 	public Collection<AttributeConverterInfo> getAttributeConverters() {
 		return attributeConverterInfoMap != null
 				? new ArrayList<>( attributeConverterInfoMap.values() )
@@ -175,8 +182,8 @@ public class BootstrapContextImpl implements BootstrapContext {
 		scanEnvironment = null;
 		scannerSetting = null;
 		archiveDescriptorFactory = null;
-//		jandexView = null;
-//
+		jandexView = null;
+
 //		if ( sqlFunctionMap != null ) {
 //			sqlFunctionMap.clear();
 //		}
@@ -240,11 +247,11 @@ public class BootstrapContextImpl implements BootstrapContext {
 		this.archiveDescriptorFactory = factory;
 	}
 
-//	void injectJandexView(IndexView jandexView) {
-//		log.debugf( "Injecting Jandex IndexView [%s] into BootstrapContext; was [%s]", jandexView, this.jandexView );
-//		this.jandexView = jandexView;
-//	}
-//
+	void injectJandexView(IndexView jandexView) {
+		log.debugf( "Injecting Jandex IndexView [%s] into BootstrapContext; was [%s]", jandexView, this.jandexView );
+		this.jandexView = jandexView;
+	}
+
 //	public void addSqlFunction(String functionName, SqmFunctionTemplate function) {
 //		if ( this.sqlFunctionMap == null ) {
 //			this.sqlFunctionMap = new HashMap<>();

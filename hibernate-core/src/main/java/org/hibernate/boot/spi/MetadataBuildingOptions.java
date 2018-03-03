@@ -60,15 +60,8 @@ public interface MetadataBuildingOptions {
 	 */
 	List<BasicTypeRegistration> getBasicTypeRegistrations();
 
-	/**
-	 * Access to the Jandex index passed by call to
-	 * {@link org.hibernate.boot.MetadataBuilder#applyIndexView(org.jboss.jandex.IndexView)}, if any.
-	 *
-	 * @return The Jandex index
-	 */
-	IndexView getJandexView();
-
 	ImplicitNamingStrategy getImplicitNamingStrategy();
+
 	PhysicalNamingStrategy getPhysicalNamingStrategy();
 
 	/**

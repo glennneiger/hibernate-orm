@@ -21,6 +21,8 @@ import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.boot.spi.ClassLoaderAccess;
 import org.hibernate.boot.spi.MetadataBuildingOptions;
 
+import org.jboss.jandex.IndexView;
+
 /**
  * @author Andrea Boriero
  */
@@ -94,6 +96,11 @@ public class BootstrapContextImpl implements BootstrapContext {
 	@Override
 	public ReflectionManager getReflectionManager() {
 		return delegate.getReflectionManager();
+	}
+
+	@Override
+	public IndexView getJandexView() {
+		return delegate.getJandexView();
 	}
 
 	@Override

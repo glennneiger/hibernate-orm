@@ -198,7 +198,7 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 
 	@Override
 	public MetadataBuilder applyIndexView(IndexView jandexView) {
-		this.options.jandexView = jandexView;
+		this.bootstrapContext.injectJandexView( jandexView );
 		return this;
 	}
 
@@ -605,8 +605,6 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 
 		private ArrayList<BasicTypeRegistration> basicTypeRegistrations = new ArrayList<>();
 
-		private IndexView jandexView;
-
 		private ImplicitNamingStrategy implicitNamingStrategy;
 		private PhysicalNamingStrategy physicalNamingStrategy;
 
@@ -785,11 +783,6 @@ public class MetadataBuilderImpl implements MetadataBuilderImplementor, TypeCont
 		@Override
 		public List<BasicTypeRegistration> getBasicTypeRegistrations() {
 			return basicTypeRegistrations;
-		}
-
-		@Override
-		public IndexView getJandexView() {
-			return jandexView;
 		}
 
 		@Override

@@ -59,11 +59,6 @@ public abstract class AbstractDelegatingMetadataBuildingOptions implements Metad
 	}
 
 	@Override
-	public IndexView getJandexView() {
-		return delegate.getJandexView();
-	}
-
-	@Override
 	public ImplicitNamingStrategy getImplicitNamingStrategy() {
 		return delegate.getImplicitNamingStrategy();
 	}
