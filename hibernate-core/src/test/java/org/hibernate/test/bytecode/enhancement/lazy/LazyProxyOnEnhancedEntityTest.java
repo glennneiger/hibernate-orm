@@ -64,7 +64,6 @@ public class LazyProxyOnEnhancedEntityTest extends BaseCoreFunctionalTestCase {
     @Test
     public void test() {
         EventListenerRegistry registry = sessionFactory().getServiceRegistry().getService( EventListenerRegistry.class );
-        registry.prependListeners( EventType.FLUSH, new DefaultFlushEventListener() );
         registry.prependListeners( EventType.LOAD, new ImmediateLoadTrap() );
 
         doInJPA( this::sessionFactory, em -> {
