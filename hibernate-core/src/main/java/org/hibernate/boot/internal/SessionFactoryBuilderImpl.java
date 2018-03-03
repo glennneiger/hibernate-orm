@@ -53,7 +53,10 @@ public class SessionFactoryBuilderImpl implements SessionFactoryBuilderImplement
 		this.metadata = metadata;
 		this.bootstrapContext = bootstrapContext;
 
-		this.optionsBuilder = new SessionFactoryOptionsBuilder( metadata.getMetadataBuildingOptions().getServiceRegistry() );
+		this.optionsBuilder = new SessionFactoryOptionsBuilder(
+				metadata.getMetadataBuildingOptions().getServiceRegistry(),
+				bootstrapContext
+		);
 
 		if ( metadata.getSqlFunctionMap() != null ) {
 			for ( Map.Entry<String, SQLFunction> sqlFunctionEntry : metadata.getSqlFunctionMap().entrySet() ) {
@@ -429,11 +432,6 @@ public class SessionFactoryBuilderImpl implements SessionFactoryBuilderImplement
 	public SessionFactoryBuilder enableJpaClosedCompliance(boolean enabled) {
 		this.optionsBuilder.enableJpaClosedCompliance( enabled );
 		return this;
-	}
-
-	@Override
-	public void markAsJpaBootstrap() {
-		this.optionsBuilder.markAsJpaBootstrap();
 	}
 
 	@Override

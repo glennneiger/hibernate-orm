@@ -47,6 +47,16 @@ public class BootstrapContextImpl implements BootstrapContext {
 	}
 
 	@Override
+	public boolean isJpaBootstrap() {
+		return delegate.isJpaBootstrap();
+	}
+
+	@Override
+	public void markAsJpaBootstrap() {
+		delegate.markAsJpaBootstrap();
+	}
+
+	@Override
 	public ClassLoader getJpaTempClassLoader() {
 		return delegate.getJpaTempClassLoader();
 	}

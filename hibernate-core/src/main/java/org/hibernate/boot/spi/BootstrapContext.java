@@ -35,14 +35,13 @@ public interface BootstrapContext {
 
 	MetadataBuildingOptions getMetadataBuildingOptions();
 
-//	boolean isJpaBootstrap();
-//
-//	/**
-//	 * Indicates that bootstrap was initiated from JPA bootstrapping.  Internally {@code false} is
-//	 * the assumed value.  We only need to call this to mark that as true.
-//	 */
-//	void markAsJpaBootstrap();
-//
+	boolean isJpaBootstrap();
+
+	/**
+	 * Indicates that bootstrap was initiated from JPA bootstrapping.  Internally {@code false} is
+	 * the assumed value.  We only need to call this to mark that as true.
+	 */
+	void markAsJpaBootstrap();
 
 	/**
 	 * Access the temporary ClassLoader passed to us as defined by

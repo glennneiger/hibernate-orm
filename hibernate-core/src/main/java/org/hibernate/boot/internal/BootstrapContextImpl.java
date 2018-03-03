@@ -54,6 +54,8 @@ public class BootstrapContextImpl implements BootstrapContext {
 	private final ClassmateContext classmateContext;
 	private final MetadataBuildingOptions metadataBuildingOptions;
 
+	private boolean isJpaBootstrap;
+
 	private HashMap<Class,AttributeConverterInfo> attributeConverterInfoMap;
 
 	private ScanOptions scanOptions;
@@ -105,6 +107,16 @@ public class BootstrapContextImpl implements BootstrapContext {
 	@Override
 	public MetadataBuildingOptions getMetadataBuildingOptions() {
 		return metadataBuildingOptions;
+	}
+
+	@Override
+	public boolean isJpaBootstrap() {
+		return isJpaBootstrap;
+	}
+
+	@Override
+	public void markAsJpaBootstrap() {
+		isJpaBootstrap = true;
 	}
 
 	@Override

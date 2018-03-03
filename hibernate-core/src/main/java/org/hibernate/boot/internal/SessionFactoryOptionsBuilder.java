@@ -31,6 +31,7 @@ import org.hibernate.boot.SchemaAutoTooling;
 import org.hibernate.boot.TempTableDdlTransactionHandling;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.selector.spi.StrategySelector;
+import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.boot.spi.SessionFactoryOptions;
 import org.hibernate.cache.internal.StandardQueryCacheFactory;
 import org.hibernate.cache.spi.QueryCacheFactory;
@@ -228,8 +229,9 @@ public class SessionFactoryOptionsBuilder implements SessionFactoryOptions {
 	private boolean failOnPaginationOverCollectionFetchEnabled;
 
 	@SuppressWarnings({"WeakerAccess", "deprecation"})
-	public SessionFactoryOptionsBuilder(StandardServiceRegistry serviceRegistry) {
+	public SessionFactoryOptionsBuilder(StandardServiceRegistry serviceRegistry, BootstrapContext context) {
 		this.serviceRegistry = serviceRegistry;
+		this.jpaBootstrap = context.isJpaBootstrap();
 
 		final StrategySelector strategySelector = serviceRegistry.getService( StrategySelector.class );
 		ConfigurationService cfgService = serviceRegistry.getService( ConfigurationService.class );
@@ -1220,10 +1222,6 @@ public class SessionFactoryOptionsBuilder implements SessionFactoryOptions {
 
 	public void enableJpaCachingCompliance(boolean enabled) {
 		this.jpaCompliance.setCachingCompliance( enabled );
-	}
-
-	public void markAsJpaBootstrap() {
-		this.jpaBootstrap = true;
 	}
 
 	public void disableRefreshDetachedEntity() {
