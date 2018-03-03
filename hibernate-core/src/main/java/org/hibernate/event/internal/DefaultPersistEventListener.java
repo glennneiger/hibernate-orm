@@ -6,6 +6,7 @@
  */
 package org.hibernate.event.internal;
 
+import java.io.Serializable;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -23,6 +24,8 @@ import org.hibernate.event.spi.PersistEventListener;
 import org.hibernate.id.ForeignGenerator;
 import org.hibernate.internal.CoreLogging;
 import org.hibernate.internal.CoreMessageLogger;
+import org.hibernate.jpa.event.spi.CallbackRegistry;
+import org.hibernate.jpa.event.spi.CallbackRegistryConsumer;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.pretty.MessageHelper;
 import org.hibernate.proxy.HibernateProxy;
@@ -34,8 +37,39 @@ import org.hibernate.proxy.LazyInitializer;
  *
  * @author Gavin King
  */
-public class DefaultPersistEventListener extends AbstractSaveEventListener implements PersistEventListener {
+public class DefaultPersistEventListener
+		extends AbstractSaveEventListener
+		implements PersistEventListener, CallbackRegistryConsumer {
 	private static final CoreMessageLogger LOG = CoreLogging.messageLogger( DefaultPersistEventListener.class );
+
+	private CallbackRegistry callbackRegistry;
+
+	@Override
+	public void injectCallbackRegistry(CallbackRegistry callbackRegistry) {
+		this.callbackRegistry = callbackRegistry;
+	}
+
+	@Override
+	protected Serializable saveWithRequestedId(
+			Object entity,
+			Serializable requestedId,
+			String entityName,
+			Object anything,
+			EventSource source) {
+		callbackRegistry.preCreate( entity );
+		return super.saveWithRequestedId( entity, requestedId, entityName, anything, source );
+	}
+
+	@Override
+	protected Serializable saveWithGeneratedId(
+			Object entity,
+			String entityName,
+			Object anything,
+			EventSource source,
+			boolean requiresImmediateIdAccess) {
+		callbackRegistry.preCreate( entity );
+		return super.saveWithGeneratedId( entity, entityName, anything, source, requiresImmediateIdAccess );
+	}
 
 	@Override
 	protected CascadingAction getCascadeAction() {
@@ -52,7 +86,6 @@ public class DefaultPersistEventListener extends AbstractSaveEventListener imple
 	 *
 	 * @param event The create event to be handled.
 	 *
-	 * @throws HibernateException
 	 */
 	public void onPersist(PersistEvent event) throws HibernateException {
 		onPersist( event, new IdentityHashMap( 10 ) );
@@ -63,7 +96,6 @@ public class DefaultPersistEventListener extends AbstractSaveEventListener imple
 	 *
 	 * @param event The create event to be handled.
 	 *
-	 * @throws HibernateException
 	 */
 	public void onPersist(PersistEvent event, Map createCache) throws HibernateException {
 		final SessionImplementor source = event.getSession();

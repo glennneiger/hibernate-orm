@@ -9,11 +9,8 @@ package org.hibernate.jpa.event.spi;
 import java.util.Map;
 
 import org.hibernate.HibernateException;
-import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.boot.Metadata;
-import org.hibernate.boot.internal.MetadataImpl;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
-import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.spi.CascadeStyle;
 import org.hibernate.engine.spi.CascadeStyles;
@@ -36,8 +33,8 @@ import org.hibernate.jpa.event.internal.core.JpaFlushEventListener;
 import org.hibernate.jpa.event.internal.core.JpaMergeEventListener;
 import org.hibernate.jpa.event.internal.core.JpaPersistEventListener;
 import org.hibernate.jpa.event.internal.core.JpaPersistOnFlushEventListener;
-import org.hibernate.jpa.event.internal.core.JpaPostDeleteEventListener;
-import org.hibernate.jpa.event.internal.core.JpaPostInsertEventListener;
+import org.hibernate.event.internal.PostDeleteEventListenerStandardImpl;
+import org.hibernate.event.internal.JpaPostInsertEventListener;
 import org.hibernate.jpa.event.internal.core.JpaPostLoadEventListener;
 import org.hibernate.jpa.event.internal.core.JpaPostUpdateEventListener;
 import org.hibernate.jpa.event.internal.core.JpaSaveEventListener;
@@ -100,7 +97,7 @@ public class JpaIntegrator implements Integrator {
 		eventListenerRegistry.setListeners( EventType.SAVE_UPDATE, new JpaSaveOrUpdateEventListener() );
 
 		// post op listeners
-		eventListenerRegistry.prependListeners( EventType.POST_DELETE, new JpaPostDeleteEventListener() );
+		eventListenerRegistry.prependListeners( EventType.POST_DELETE, new PostDeleteEventListenerStandardImpl() );
 		eventListenerRegistry.prependListeners( EventType.POST_INSERT, new JpaPostInsertEventListener() );
 		eventListenerRegistry.prependListeners( EventType.POST_LOAD, new JpaPostLoadEventListener() );
 		eventListenerRegistry.prependListeners( EventType.POST_UPDATE, new JpaPostUpdateEventListener() );
